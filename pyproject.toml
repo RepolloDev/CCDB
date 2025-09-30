@@ -1,0 +1,7 @@
+[project]
+name = "ccdb"
+version = "1.0.0"
+description = "Sistema Web para control de inscripciones y elementos del Centro Cultural Don Bosco"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
