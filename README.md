@@ -40,7 +40,8 @@ archivo `main.py`.
 > [!tip]
 > [uv](https://docs.astral.sh/uv/) es un
 > **Gestor de paquetes para Python** rápido
-> y fácil de usar, una navaja suisa de Python.
+> y fácil de usar, similar a `pip` de Python,
+> pero con mejoras grandes
 
 ```bash
 # Crear el entorno virtual
