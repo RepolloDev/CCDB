@@ -17,3 +17,38 @@
 
 > [!important]
 > Proyecto realizado únicamente con fines educativos para la materia _Base de Datos 2_
+
+## 🚀 Comienzo rápido
+
+Primero es necesario clonar el
+repositorio y entrar a este mediante
+la terminal.
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/RepolloDev/CCDB.git
+# Entrar al directorio del proyecto
+cd CCDB
+```
+
+Utilizando [uv](https://docs.astral.sh/uv/)
+se crea el entorno virtual dentro del
+proyecto `.venv`, instalar las librarías
+externas y correr el proyecto con el
+archivo `main.py`.
+
+> [!tip]
+> [uv](https://docs.astral.sh/uv/) es un
+> **Gestor de paquetes para Python** rápido
+> y fácil de usar, una navaja suisa de Python.
+
+```bash
+# Crear el entorno virtual
+uv venv
+# Instalar las librarias
+uv install
+# Correr `main.py`
+uv run main.py
+```
+
+Con todo esto correría el proyecto 🎉
