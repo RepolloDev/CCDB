@@ -1,0 +1,23 @@
+services:
+  db:
+    image: gvenzl/oracle-free:23-full-faststart
+    container_name: ccdb
+    environment:
+      # Admin user password
+      ORACLE_PASSWORD: adminpassword
+      # Application user and password
+      APP_USER: myuser
+      APP_USER_PASSWORD: mypassword
+      # Database service name
+      ORACLE_DATABASE: XE
+    volumes:
+      # Persist data
+      - data:/opt/oracle/oradata
+      # Save seed data here
+      - ./seed:/opt/oracle/seed:Z,ro
+      # Run init scripts
+      - ./scripts:/container-entrypoint-initdb.d/Z,ro
+    ports:
+      - "1521:1521"
+volumes:
+  data:
