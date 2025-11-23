@@ -54,9 +54,13 @@
         font-family: "Geist", monospace !important;
       }
     </style>
+    <!-- Bloques para head personalizado -->
     {% block head %}{% endblock %}
   </head>
   <body>
-    {% block body %}{% endblock %} {% block scripts %}{% endblock %}
+    <!-- Para el contenido -->
+    {% block body %}{% endblock %}
+    <!-- Scripts personalizados -->
+    {% block scripts %}{% endblock %}
   </body>
 </html>

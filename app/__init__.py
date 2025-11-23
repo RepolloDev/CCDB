@@ -33,8 +33,28 @@ def home():
 
 @app.route("/participantes")
 def participantes():
-    
-    return render_template("participantes.html")
+    participantes_data = {
+        "columns": [
+            {
+                "id": "ID",
+                "name": "ID",
+            },
+            {
+                "id": "Nombre",
+                "name": "Nombre",
+            },
+            {
+                "id": "Edad",
+                "name": "Edad",
+            },
+        ],
+        "data": [
+            {"ID": 1, "Nombre": "Juan Perez", "Edad": 25},
+            {"ID": 2, "Nombre": "Maria Gomez", "Edad": 30},
+            {"ID": 3, "Nombre": "Luis Rodriguez", "Edad": 22},
+        ],
+    }
+    return render_template("participantes.html", data=participantes_data)
 
 
 @app.route("/voluntarios")

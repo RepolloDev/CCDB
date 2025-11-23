@@ -1,0 +1,11 @@
+.gridjs {
+    .gridjs-footer .gridjs-pages {
+        display: flex;
+        gap: 0.5rem;
+        overflow-x: auto;
+        button {
+            overflow: visible !important;
+            width: auto !important;
+        }
+    }
+}

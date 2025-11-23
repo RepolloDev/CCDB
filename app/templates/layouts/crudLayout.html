@@ -1,9 +1,14 @@
 {% extends "layouts/dashboardLayout.html" %}
 <!-- Scripts para el CRUD -->
-{% block extra_head %}
-<link
+{% block head %}
+<!-- <link
   href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css"
+  rel="stylesheet"
+/> -->
+<link
+  href="{{ url_for('static', filename='css/tables.css') }}"
   rel="stylesheet"
 />
 <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+<script src="{{ url_for('static', filename='js/table.js') }}"></script>
 {% endblock %}
