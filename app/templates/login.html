@@ -1,0 +1,79 @@
+{% extends "layouts/baseLayout.html" %} {% block body %}
+<main
+  class="content-container bg-base-100 h-screen overflow-y-auto overflow-x-hidden"
+>
+  <div class="flex h-full w-full">
+    <div class="w-full flex flex-col items-center justify-center">
+      <form class="md:w-96 w-80 flex flex-col items-center justify-center">
+        <h2 class="text-4xl text-gray-900 font-medium">Iniciar sesión</h2>
+        <p class="text-sm text-gray-500/90 mt-3">
+          Bienvenido de nuevo! Por favor ingresa a tu cuenta.
+        </p>
+
+        <a
+          type="button"
+          href="/"
+          class="w-full mt-8 bg-gray-300 flex items-center justify-center h-12 rounded-full"
+        >
+          {% include 'partials/googleBtn.html' %}
+        </a>
+
+        <div class="flex items-center gap-4 w-full my-5">
+          <div class="w-full h-px bg-gray-300/90"></div>
+          <p class="w-full text-nowrap text-sm text-gray-500/90">
+            o inicia sesión con correo electrónico
+          </p>
+          <div class="w-full h-px bg-gray-300/90"></div>
+        </div>
+
+        <label class="input validator w-full">
+          <box-icon name="envelope"></box-icon>
+          <input
+            type="text"
+            required
+            placeholder="Correo electrónico"
+            value="ruben.alejo@example.com"
+          />
+        </label>
+        <div class="h-4"></div>
+        <label class="input validator w-full">
+          <box-icon name="lock-open-alt"></box-icon>
+          <input
+            type="text"
+            required
+            placeholder="Contraseña"
+            value="pass123"
+          />
+        </label>
+
+        <div
+          class="w-full flex items-center justify-between mt-8 text-gray-500/80"
+        >
+          <label class="label">
+            <input type="checkbox" checked="checked" class="checkbox" />
+            Recordarme
+          </label>
+          <a class="text-sm underline" href="#">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <div class="h-6"></div>
+        <a href="/" class="btn btn-accent btn-lg w-full"> Iniciar sesión </a>
+        <p class="text-gray-500/90 text-sm mt-4">
+          ¿No tienes una cuenta?
+          <a class="text-indigo-400 hover:underline" href="#"
+            >Habla con el administrador</a
+          >
+        </p>
+      </form>
+    </div>
+    <div class="w-full hidden md:inline-block">
+      <img
+        class="h-full w-full object-cover"
+        style="object-position: -2rem center"
+        src="{{ url_for('static', filename='img/banner.png') }}"
+        alt="leftSideImage"
+      />
+    </div>
+  </div>
+</main>
+{% endblock %}

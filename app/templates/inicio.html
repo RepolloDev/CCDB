@@ -1,0 +1,121 @@
+{% extends "layouts/dashboardLayout.html" %}
+<!-- CDN para gráficos -->
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+{% endblock %}
+<!-- Titulo de la página -->
+{% block title %}
+<span>Dashboard</span>
+{% endblock %}
+<!-- Contenido específico de la página de inicio -->
+{% block content %}
+<!-- Estadísticas resumen -->
+<div class="stats w-full bg-base-100 border-base-300 border">
+  <div class="stat">
+    <div class="stat-title">Cantidad de Cursos/Talleres</div>
+    <div class="stat-value">23</div>
+    <div class="stat-desc">Jan 1st - Mar 1st</div>
+    <div class="stat-actions mt-1">
+      <a href="/cursos_talleres" class="btn btn-xs">Ver cursos</a>
+    </div>
+  </div>
+  <div class="stat">
+    <div class="stat-title">Cantidad de Servicios</div>
+    <div class="stat-value">23</div>
+    <div class="stat-desc">Jan 1st - Mar 1st</div>
+    <div class="stat-actions mt-1">
+      <a href="/servicios" class="btn btn-xs">Ver servicios</a>
+    </div>
+  </div>
+  <div class="stat">
+    <div class="stat-title">Nuevos Participantes</div>
+    <div class="stat-value">32</div>
+    <div class="stat-desc">↗︎ 6 (22%)</div>
+    <div class="stat-actions mt-1">
+      <a href="/participantes" class="btn btn-xs">Ver participantes</a>
+      <a href="/inscripciones" class="btn btn-xs btn-success"
+        >Ver inscripciones</a
+      >
+    </div>
+  </div>
+  <div class="stat">
+    <div class="stat-title">Nuevos Voluntarios</div>
+    <div class="stat-value">13</div>
+    <div class="stat-desc">↗︎ 3 (23%)</div>
+    <div class="stat-actions mt-1">
+      <a href="/voluntarios" class="btn btn-xs">Ver voluntarios</a>
+      <a href="/asignaciones" class="btn btn-xs btn-success"
+        >Ver asignaciones</a
+      >
+    </div>
+  </div>
+</div>
+<!-- Gráficos de análisis -->
+<div class="h-8"></div>
+<div class="w-full grid grid-cols-[0.65fr_0.35fr] gap-4 bg-base-100">
+  <div
+    class="border-base-300 border p-4 rounded-lg grid grid-cols-[14rem_1fr] w-full"
+  >
+    <!-- Resumen de aportes -->
+    <div class="card w-full card-xs">
+      <div class="card-body">
+        <h2 class="card-title text-xl font-semibold">Aportes</h2>
+        <span>Descripción general de aportes</span>
+        <div class="stats stats-vertical rounded-none">
+          <div class="stat p-0 pb-2">
+            <div class="stat-figure">
+              <box-icon name="money" size="lg"></box-icon>
+            </div>
+            <div class="stat-value">Bs. 425</div>
+            <div class="stat-title">Ingresos en el mes</div>
+          </div>
+          <div class="stat p-0 pt-2">
+            <div class="stat-figure">
+              <box-icon name="group" size="lg"></box-icon>
+            </div>
+            <div class="stat-value">32</div>
+            <div class="stat-title">Aportantes en el mes</div>
+          </div>
+        </div>
+        <div class="h-4"></div>
+        <div class="justify-start card-actions mt-auto">
+          <a href="/aportes" class="btn btn-primary w-full">Ver aportes</a>
+        </div>
+      </div>
+    </div>
+    <!-- Gráfico de aportes -->
+    <div
+      id="chart-area"
+      class="w-full overflow-hidden skeleton min-h-[415px]"
+    ></div>
+  </div>
+  <!-- Analsis de participantes por edad -->
+  <div
+    class="border-base-300 border p-4 rounded-lg w-full grid grid-rows-[auto_1fr]"
+  >
+    <h2 class="text-xl font-semibold">Aportantes</h2>
+    <span class="text-xs">Distribución por edades</span>
+    <div
+      id="chart-donut"
+      class="w-full overflow-hidden skeleton min-h-[315px]"
+    ></div>
+  </div>
+</div>
+{% endblock %}
+<!-- Scripts específicos de la página de inicio -->
+{% block extra_scripts %}
+<script id="area-data" type="application/json">
+  {{ area_data | tojson }}
+</script>
+<script id="donut-data" type="application/json">
+  {{ donut_data | tojson }}
+</script>
+<script
+  defer
+  src="{{ url_for('static', filename='js/areaChart.js') }}"
+></script>
+<script
+  defer
+  src="{{ url_for('static', filename='js/donutChart.js') }}"
+></script>
+{% endblock %}

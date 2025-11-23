@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="silk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--        Metadatos       -->
+    <title>Centro Cultural Don Bosco</title>
+    <meta
+      name="description"
+      content="Sistema de gestión del Centro Recreativo Don Bosco"
+    />
+    <meta name="author" content="Grupo de base de datos 2" />
+
+    <!--        Íconos       -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+
+    <!--        Global CSS and JS          -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/global.css') }}"
+    />
+    <script
+      src="{{ url_for('static', filename='js/global.js') }}"
+      defer
+    ></script>
+
+    <!--        CDNs          -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <!--        Estilos personalizados       -->
+    <style>
+      * {
+        font-family: "Geist", monospace !important;
+      }
+    </style>
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    {% block body %}{% endblock %} {% block scripts %}{% endblock %}
+  </body>
+</html>

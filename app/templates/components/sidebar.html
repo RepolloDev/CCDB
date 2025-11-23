@@ -1,0 +1,87 @@
+<aside
+  id="sidebar-container"
+  class="sidebar-container bg-base-200 min-h-screen w-80 py-8 flex flex-col"
+>
+  <div
+    class="sidebar-header navbar sticky top-0 z-20 hidden items-center gap-2 px-4 py-0 backdrop-blur lg:flex"
+  >
+    <a
+      href="/"
+      class="-ms-2 me-2 flex w-full shrink-0 items-center justify-center gap-2"
+    >
+      <img
+        src="{{ url_for('static', filename='logo.svg') }}"
+        alt="Logo"
+        class="h-16 w-16"
+      />
+      <div class="font-semibold flex flex-col justify-center">
+        <span class="text-2xl">Centro Cultural</span>
+        <span class="text-lg -mt-2">Don Bosco</span>
+      </div>
+    </a>
+  </div>
+  <div class="h-8"></div>
+  <ul class="sidebar-nav menu menu-xl w-full px-4 py-0">
+    <li>
+      <a href="/">
+        <box-icon name="grid-alt" type="solid"></box-icon>
+        Inicio
+      </a>
+    </li>
+    <li class="submenu">
+      <details>
+        <summary>
+          <box-icon name="user"></box-icon>
+          Personas
+        </summary>
+        <ul>
+          <li><a href="/participantes">Participantes</a></li>
+          <li><a href="/voluntarios">Voluntarios</a></li>
+          <li><a href="/tutores">Tutores</a></li>
+        </ul>
+      </details>
+    </li>
+    <li class="submenu">
+      <details>
+        <summary>
+          <box-icon name="task"></box-icon>
+          Actividades
+        </summary>
+        <ul>
+          <li><a href="/cursos_talleres">Cursos/Talleres</a></li>
+          <li><a href="/servicios">Servicios</a></li>
+        </ul>
+      </details>
+    </li>
+    <li class="submenu">
+      <details open>
+        <summary>
+          <box-icon name="rocket"></box-icon>
+          Operaciones
+        </summary>
+        <ul>
+          <li><a href="/inscripciones">Inscripciones</a></li>
+          <li><a href="/asignaciones">Asignaciones</a></li>
+          <li><a href="/aportes">Aportes</a></li>
+        </ul>
+      </details>
+    </li>
+    <li class="submenu">
+      <details>
+        <summary>
+          <box-icon name="calendar"></box-icon>
+          Organización
+        </summary>
+        <ul>
+          <li><a href="/periodos">Periodos</a></li>
+          <li><a href="/salones">Salones</a></li>
+          <li><a href="/horarios">Horarios</a></li>
+        </ul>
+      </details>
+    </li>
+  </ul>
+  <a href="/login" class="btn btn-lg btn-error mt-auto w-5/6 mx-auto">
+    <box-icon name="log-out" rotate="180"></box-icon>
+    Cerrar sesión</a
+  >
+</aside>
