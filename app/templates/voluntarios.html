@@ -1,9 +1,61 @@
-{% extends "layouts/dashboardLayout.html" %}
+{% extends "layouts/crudLayout.html" %}
 <!-- Title -->
-{% block title%}
+{% block title %}
 <span>Voluntarios</span>
 {% endblock %}
+
 <!-- Content -->
 {% block content %}
-<span>Hola mundo</span>
+<div>
+  <!-- Statistics -->
+  <div class="stats border border-base-300 w-full">
+    <div class="stat">
+      <div class="stat-figure text-primary">
+        <box-icon name="user-plus" size="lg"></box-icon>
+      </div>
+      <div class="stat-title">Total de voluntarios</div>
+      <div class="stat-value text-primary">102</div>
+      <div class="stat-desc">Registrados en todo el tiempo</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-figure text-secondary">
+        <box-icon name="show" size="lg"></box-icon>
+      </div>
+      <div class="stat-title">Voluntarios activos</div>
+      <div class="stat-value text-secondary">51</div>
+      <div class="stat-desc">50% del total</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-figure text-secondary">
+        <box-icon type="solid" name="baby-carriage" size="lg"></box-icon>
+      </div>
+      <div class="stat-value">32</div>
+      <div class="stat-title">Menores de edad</div>
+      <div class="stat-desc text-secondary">31% del total</div>
+    </div>
+  </div>
+</div>
+
+<!-- Table -->
+<div>
+  <h2 class="my-8 text-2xl font-semibold">Vista general</h2>
+  <div class="overflow-x-auto">
+    <div id="voluntarios-table"></div>
+  </div>
+</div>
+{% endblock %}
+
+<!-- Scripts -->
+{% block scripts %}
+<script id="voluntarios-data" type="application/json">
+  {{ data | tojson }}
+</script>
+<script>
+  const jsonData = JSON.parse(document.getElementById("voluntarios-data").textContent);
+  const columns = jsonData.columns;
+  const data = jsonData.data;
+  createTable(columns, data, "voluntarios-table");
+</script>
 {% endblock %}

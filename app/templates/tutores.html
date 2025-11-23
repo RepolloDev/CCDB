@@ -1,9 +1,66 @@
-{% extends "layouts/dashboardLayout.html" %}
+{% extends "layouts/crudLayout.html" %}
 <!-- Title -->
-{% block title%}
+{% block title %}
 <span>Tutores</span>
 {% endblock %}
+
 <!-- Content -->
 {% block content %}
-<span>Hola mundo</span>
+<div>
+  <!-- Statistics -->
+  <div class="stats border border-base-300 w-full">
+    <div class="stat">
+      <div class="stat-figure text-primary">
+        <box-icon name="user-plus" size="lg"></box-icon>
+      </div>
+      <div class="stat-title">Total de tutores</div>
+      <div class="stat-value text-primary">7</div>
+      <div class="stat-desc">Registrados en todo el tiempo</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-figure text-secondary">
+        <box-icon name="show" size="lg"></box-icon>
+      </div>
+      <div class="stat-title">Tutores activos</div>
+      <div class="stat-value text-secondary">4</div>
+      <div class="stat-desc">Ejemplo</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-figure text-secondary">
+        <box-icon type="solid" name="baby-carriage" size="lg"></box-icon>
+      </div>
+      <div class="stat-value">1</div>
+      <div class="stat-title">Menores de edad</div>
+      <div class="stat-desc text-secondary">Ejemplo</div>
+    </div>
+  </div>
+</div>
+
+<!-- Table -->
+<div>
+  <h2 class="my-8 text-2xl font-semibold">Vista general</h2>
+  <div class="overflow-x-auto">
+    <div id="tutores-table"></div>
+  </div>
+</div>
+{% endblock %}
+
+<!-- Scripts -->
+{% block scripts %}
+<script id="tutores-data" type="application/json">
+  {{ data | tojson }}
+</script>
+
+<script>
+  const jsonData = JSON.parse(
+    document.getElementById("tutores-data").textContent
+  );
+
+  const columns = jsonData["columns"];
+  const data = jsonData["data"];
+
+  createTable(columns, data, "tutores-table");
+</script>
 {% endblock %}

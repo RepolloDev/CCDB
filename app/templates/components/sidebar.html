@@ -54,7 +54,7 @@
       </details>
     </li>
     <li class="submenu">
-      <details open>
+      <details>
         <summary>
           <box-icon name="rocket"></box-icon>
           Operaciones
@@ -85,3 +85,23 @@
     Cerrar sesión</a
   >
 </aside>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const detailsElements = document.querySelectorAll("#sidebar-container details");
+
+    detailsElements.forEach((detail) => {
+      detail.addEventListener("toggle", () => {
+        if (detail.open) {
+          // Cierra todos los demás
+          detailsElements.forEach((other) => {
+            if (other !== detail) {
+              other.removeAttribute("open");
+            }
+          });
+        }
+      });
+    });
+  });
+</script>

@@ -1,6 +1,38 @@
 from flask import Flask, render_template
+import os
+from sqlalchemy import text
+from urllib.parse import quote_plus
+from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv
+
+load_dotenv()
+
+db_user = os.getenv("DB_USER")
+db_password = os.getenv("DB_PASSWORD")
+db_host = os.getenv("DB_HOST")
+db_port = os.getenv("DB_PORT")
+db_name = os.getenv("DB_NAME")
+
+db_password_quoted = quote_plus(db_password)
+
+DATABASE_URL = (
+    f"postgresql://{db_user}:{db_password_quoted}@{db_host}:{db_port}/{db_name}"
+)
 
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db = SQLAlchemy(app)
+
+
+@app.route("/test")
+def test():
+    query_sql = text("select * from participantes_publico")
+    result_proxy = db.session.execute(query_sql)
+    datos_crudos = [dict(row) for row in result_proxy.mappings()]
+    salida_texto = str(datos_crudos)
+    return render_template("tests/db.html", data=salida_texto)
 
 
 @app.route("/login")
@@ -30,41 +62,79 @@ def home():
 
 # region PERSONAS
 
+"""
+CREATE OR REPLACE VIEW participantes_publico
+AS
+	SELECT p.id_participante, pe.nombre ||' '||pe.paterno||' '||pe.materno AS nombre_completo, pe.ci, p.matricula, p.estado, tx.datos_tutor 
+	FROM participante p
+	JOIN persona pe ON pe.id_persona = p.id_persona
+	LEFT JOIN (	SELECT t.id_tutor, p.nombre||' '||p.paterno||' '||p.materno||' ('||t.parentesco||')' as datos_tutor
+			FROM tutor t
+			JOIN persona p ON p.id_persona = t.id_persona) tx ON tx.id_tutor = p.id_tutor
+"""
 
 @app.route("/participantes")
 def participantes():
+    # Definimos las columnas que queremos mostrar
+    columnas = [
+        {"id": "id_participante", "name": "ID"},
+        {"id": "nombre_completo", "name": "Nombre"},
+        {"id": "ci", "name": "Carnet"},
+        {"id": "matricula", "name": "Matricula"},
+        {"id": "estado", "name": "Estado"},
+        {"id": "datos_tutor", "name": "Tutor"},
+    ]
+
+    # Ejecutamos la consulta
+    query_sql = text("SELECT * FROM participantes_publico")
+    result_proxy = db.session.execute(query_sql)
+
+    # Convertimos cada fila en dict
+    datos_crudos = [dict(row) for row in result_proxy.mappings()]
+
+    # Armamos la estructura final
     participantes_data = {
-        "columns": [
-            {
-                "id": "ID",
-                "name": "ID",
-            },
-            {
-                "id": "Nombre",
-                "name": "Nombre",
-            },
-            {
-                "id": "Edad",
-                "name": "Edad",
-            },
-        ],
-        "data": [
-            {"ID": 1, "Nombre": "Juan Perez", "Edad": 25},
-            {"ID": 2, "Nombre": "Maria Gomez", "Edad": 30},
-            {"ID": 3, "Nombre": "Luis Rodriguez", "Edad": 22},
-        ],
+        "columns": columnas,
+        "data": datos_crudos
     }
-    return render_template("participantes.html", data=participantes_data)
+
+    # Pasamos la estructura al template
+    return render_template("participantes/index.html", data=participantes_data)
 
 
 @app.route("/voluntarios")
 def voluntarios():
-    return render_template("voluntarios.html")
+    voluntarios_data = {
+        "columns": [
+            {"id": "ID", "name": "ID"},
+            {"id": "Nombre", "name": "Nombre"},
+            {"id": "Edad", "name": "Edad"},
+            {"id": "Telefono", "name": "Teléfono"},
+        ],
+        "data": [
+            {"ID": 1, "Nombre": "Andrea Flores", "Edad": 19, "Telefono": "700-111"},
+            {"ID": 2, "Nombre": "Marco Rojas", "Edad": 21, "Telefono": "700-222"},
+            {"ID": 3, "Nombre": "Lucía Ramos", "Edad": 17, "Telefono": "700-333"},
+        ],
+    }
+    return render_template("voluntarios.html", data=voluntarios_data)
 
 
 @app.route("/tutores")
 def tutores():
-    return render_template("tutores.html")
+    tutores_data = {
+        "columns": [
+            {"id": "ID", "name": "ID"},
+            {"id": "Nombre", "name": "Nombre"},
+            {"id": "Telefono", "name": "Teléfono"},
+        ],
+        "data": [
+            {"ID": 1, "Nombre": "Carlos Rivas", "Telefono": "777-111"},
+            {"ID": 2, "Nombre": "Marcela López", "Telefono": "777-222"},
+            {"ID": 3, "Nombre": "Pedro Silva", "Telefono": "777-333"},
+        ],
+    }
+    return render_template("tutores.html", data=tutores_data)
 
 
 # endregion
