@@ -7,17 +7,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-db_user = os.getenv("DB_USER")
-db_password = os.getenv("DB_PASSWORD")
-db_host = os.getenv("DB_HOST")
-db_port = os.getenv("DB_PORT")
-db_name = os.getenv("DB_NAME")
+db_user = os.getenv("DB_USER", "").strip()
+db_password = os.getenv("DB_PASSWORD", "").strip()
+db_host = os.getenv("DB_HOST", "localhost").strip()
+db_port = os.getenv("DB_PORT", "5432").strip()
+db_name = os.getenv("DB_NAME", "").strip()
 
 db_password_quoted = quote_plus(db_password)
 
 DATABASE_URL = (
     f"postgresql://{db_user}:{db_password_quoted}@{db_host}:{db_port}/{db_name}"
 )
+
+# para asegurarme de que el url de conexion es exitosa con el postgres
+print("DATABASE_URL:", DATABASE_URL)
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
@@ -65,7 +68,7 @@ def home():
 """
 CREATE OR REPLACE VIEW participantes_publico
 AS
-	SELECT p.id_participante, pe.nombre ||' '||pe.paterno||' '||pe.materno AS nombre_completo, pe.ci, p.matricula, p.estado, tx.datos_tutor 
+	SELECT p.id_participante, pe.nombre ||' '||pe.paterno||' '||pe.materno AS nombre_completo, pe.ci, p.matricula, p.estado, COALESCE(tx.datos_tutor,'') AS datos_tutor
 	FROM participante p
 	JOIN persona pe ON pe.id_persona = p.id_persona
 	LEFT JOIN (	SELECT t.id_tutor, p.nombre||' '||p.paterno||' '||p.materno||' ('||t.parentesco||')' as datos_tutor
@@ -85,12 +88,13 @@ def participantes():
         {"id": "datos_tutor", "name": "Tutor"},
     ]
 
-    # Ejecutamos la consulta
-    query_sql = text("SELECT * FROM participantes_publico")
-    result_proxy = db.session.execute(query_sql)
-
-    # Convertimos cada fila en dict
-    datos_crudos = [dict(row) for row in result_proxy.mappings()]
+    try:
+        query_sql = text("SELECT * FROM participantes_publico")
+        result_proxy = db.session.execute(query_sql)
+        datos_crudos = [dict(row) for row in result_proxy.mappings()]
+    except Exception as e:
+        print("Error en la consulta:", e)
+        datos_crudos = []
 
     # Armamos la estructura final
     participantes_data = {
