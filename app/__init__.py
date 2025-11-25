@@ -91,7 +91,10 @@ def participantes():
     try:
         query_sql = text("SELECT * FROM participantes_publico")
         result_proxy = db.session.execute(query_sql)
-        datos_crudos = [dict(row) for row in result_proxy.mappings()]
+        datos_crudos = [
+            {k: (v if v is not None else "") for k, v in row.items()}
+            for row in result_proxy.mappings()
+        ]
     except Exception as e:
         print("Error en la consulta:", e)
         datos_crudos = []
@@ -105,7 +108,17 @@ def participantes():
     # Pasamos la estructura al template
     return render_template("participantes/index.html", data=participantes_data)
 
-
+"""
+CREATE OR ALTER VIEW voluntarios_publico
+AS
+	SELECT 	v.id_voluntario,
+			(((p.nombre::text || ' '::text) || p.paterno::text) || ' '::text) || p.materno::text AS nombre_completo,
+	    	v.correo,
+	    	ne.tipo
+	FROM voluntario v
+	JOIN persona p ON p.id_persona = v.id_persona
+	JOIN nivel_educacion ne ON ne.id_nvl_edu = v.id_nvl_edu
+"""
 @app.route("/voluntarios")
 def voluntarios():
 
@@ -131,6 +144,15 @@ def voluntarios():
     return render_template("voluntarios/index.html", data=voluntarios_data)
 
 
+"""
+CREATE OR ALTER VIEW tutores_publico
+AS
+	SELECT 	t.id_tutor,
+    		(((p.nombre::text || ' '::text) || p.paterno::text) || ' '::text) || p.materno::text AS nombre_completo,
+    		t.parentesco
+	FROM tutor t
+	JOIN persona p ON p.id_persona = t.id_persona;
+"""
 @app.route("/tutores")
 def tutores():
 
@@ -184,6 +206,15 @@ def asignaciones():
     return render_template("asignaciones.html")
 
 
+"""
+CREATE OR ALTER VIEW aportes_publico
+AS
+	SELECT 	a.id_aporte,a.monto_total, a.descripcion, a.f_creacion, a.f_edicion,
+    p.nombre||' '||p.paterno::text)||' '||p.materno AS nombre_completo
+   	FROM aporte a
+	JOIN participante pa ON pa.id_participante = a.id_participante
+	JOIN persona p ON p.id_persona = pa.id_persona;
+"""
 @app.route("/aportes")
 def aportes():
 

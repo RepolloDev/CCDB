@@ -51,13 +51,39 @@
   {{ data | tojson  }}
 </script>
 <script>
-  const jsonData = JSON.parse(
-    document.getElementById("participantes-data").textContent
-  );
-  const columns = jsonData["columns"];
-  const rawData = jsonData["data"];
 
-  createTable(columns, rawData, "participantes-table");
+  function generateSlug(text) {
+    return text
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g, "-") // Replace spaces with -
+      .replace(/[^\w\-]+/g, "") // Remove all non-word chars
+      .replace(/\-\-+/g, "-") // Replace multiple - with single -
+      .replace(/^-+/, "") // Trim - from start of text
+      .replace(/-+$/, ""); // Trim - from end of text
+  }
+
+  const jsonDataElement = document.getElementById("participantes-data");
+  if (!jsonDataElement || !jsonDataElement.textContent.trim()) {
+    console.error("Error: 'participantes-data' script element is missing or empty. Cannot load data.");
+  } else {
+    try {
+      const jsonData = JSON.parse(jsonDataElement.textContent);
+      if (!jsonData) {
+        console.error("Error: Parsed jsonData is null or undefined.");
+      } else {
+        const columns = jsonData["columns"];
+        const rawData = jsonData["data"];
+        if (!columns || !rawData) {
+          console.error("Error: 'columns' or 'data' keys are missing in jsonData.");
+        } else {
+          createTable(columns, rawData, "participantes-table");
+        }
+      }
+    } catch (e) {
+      console.error("Error parsing JSON data:", e);
+    }
+  }
   console.log("Hola");
 </script>
 {% endblock %}
