@@ -12,57 +12,36 @@ function generateSlug(text) {
 function createTable(columns, data, elementId) {
   console.log("Creating table with columns:", columns);
   const tableElement = document.getElementById(elementId);
+
+  // Convertimos columnas a objetos { name }
+  const gridColumns = columns.map(c => ({ name: c.name }));
+
+  // Transformamos cada objeto en un array ordenado según las columnas
+  const gridData = data.map(row =>
+    columns.map(c => row[c.id] ?? "")
+  );
+
+  console.log("gridColumns:", gridColumns);
+  console.log("gridData:", gridData);
+
   const grid = new gridjs.Grid({
-    data,
+    data: gridData,
     columns: [
-      ...columns,
+      ...gridColumns,
       {
         name: "Acciones",
         sort: false,
-        formatter: (cell, row) => {
-          return gridjs.html(
-            `
-                    <button class="btn btn-info" data-id="${row.cells[0].data}">Editar</button>
-                    <button class="btn btn-error" data-id="${row.cells[0].data}">Eliminar</button>
-                    `
-          );
+        formatter: (_, row) => {
+          return gridjs.html(`
+            <button class="btn btn-info" data-id="${row.cells[0].data}">Editar</button>
+            <button class="btn btn-error" data-id="${row.cells[0].data}">Eliminar</button>
+          `);
         },
       },
     ],
-    autoWidth: true,
-    fixedHeader: true,
-    pagination: {
-      enabled: true,
-      limit: 10,
-      summary: true,
-    },
-    search: {
-      enabled: true,
-    },
+    pagination: { enabled: true, limit: 10, summary: true },
+    search: { enabled: true },
     sort: true,
-    className: {
-      table: "table table-zebra bg-base-100 rounded-xl border border-base-300",
-      th: "bg-base-200",
-      td: "bg-base-100",
-      tr: "hover",
-      search: "ml-1 my-4 input input-lg box-border",
-      footer: "flex w-full my-4",
-      pagination: "join ml-auto",
-      paginationSummary: "mx-2 self-center",
-      paginationButton: "join-item btn btn-lg box-border",
-      paginationButtonCurrent: "btn-accent",
-    },
-    language: {
-      search: {
-        placeholder: "🔍 Buscar...",
-      },
-      pagination: {
-        previous: "Anterior",
-        next: "Siguiente",
-        showing: "Mostrando",
-        results: () => "Entradas",
-      },
-    },
   });
 
   grid.render(tableElement);

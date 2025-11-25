@@ -55,9 +55,9 @@
     document.getElementById("participantes-data").textContent
   );
   const columns = jsonData["columns"];
-  const data = jsonData["data"];
+  const rawData = jsonData["data"];
 
-  createTable(columns, data, "participantes-table");
+  createTable(columns, rawData, "participantes-table");
   console.log("Hola");
 </script>
 {% endblock %}
