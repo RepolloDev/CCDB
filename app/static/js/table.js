@@ -1,15 +1,3 @@
-// Función para generar slug (sin cambios)
-function generateSlug(text) {
-  return text
-    .toString()
-    .toLowerCase()
-    .replace(/\s+/g, "-") // Replace spaces with -
-    .replace(/[^\w\-]+/g, "") // Remove all non-word chars
-    .replace(/\-\-+/g, "-") // Replace multiple - with single -
-    .replace(/^-+/, "") // Trim - from start of text
-    .replace(/-+$/, ""); // Trim - from end of text
-}
-
 // Función para crear la tabla (simplificada: usa data directamente)
 function createTable(columns, data, elementId) {
   console.log("Creating table with columns:", columns);
