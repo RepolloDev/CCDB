@@ -3,6 +3,10 @@ from sqlalchemy import text
 from .db import Database
 from .routes.cursos_talleres import cursos_talleres_bp
 
+
+# para asegurarme de que el url de conexion es exitosa con el postgres
+print("DATABASE_URL:", Database.make_database_uri())
+
 app = Flask(__name__)
 db = Database.init_app(app)
 
@@ -48,7 +52,7 @@ def home():
 """
 CREATE OR REPLACE VIEW participantes_publico
 AS
-	SELECT p.id_participante, pe.nombre ||' '||pe.paterno||' '||pe.materno AS nombre_completo, pe.ci, p.matricula, p.estado, tx.datos_tutor 
+	SELECT p.id_participante, pe.nombre ||' '||pe.paterno||' '||pe.materno AS nombre_completo, pe.ci, p.matricula, p.estado, COALESCE(tx.datos_tutor,'') AS datos_tutor
 	FROM participante p
 	JOIN persona pe ON pe.id_persona = p.id_persona
 	LEFT JOIN (	SELECT t.id_tutor, p.nombre||' '||p.paterno||' '||p.materno||' ('||t.parentesco||')' as datos_tutor
@@ -69,12 +73,16 @@ def participantes():
         {"id": "datos_tutor", "name": "Tutor"},
     ]
 
-    # Ejecutamos la consulta
-    query_sql = text("SELECT * FROM participantes_publico")
-    result_proxy = db.session.execute(query_sql)
-
-    # Convertimos cada fila en dict
-    datos_crudos = [dict(row) for row in result_proxy.mappings()]
+    try:
+        query_sql = text("SELECT * FROM participantes_publico")
+        result_proxy = db.session.execute(query_sql)
+        datos_crudos = [
+            {k: (v if v is not None else "") for k, v in row.items()}
+            for row in result_proxy.mappings()
+        ]
+    except Exception as e:
+        print("Error en la consulta:", e)
+        datos_crudos = []
 
     # Armamos la estructura final
     participantes_data = {"columns": columnas, "data": datos_crudos}
@@ -83,39 +91,70 @@ def participantes():
     return render_template("participantes/index.html", data=participantes_data)
 
 
+"""
+CREATE OR ALTER VIEW voluntarios_publico
+AS
+	SELECT 	v.id_voluntario,
+			(((p.nombre::text || ' '::text) || p.paterno::text) || ' '::text) || p.materno::text AS nombre_completo,
+	    	v.correo,
+	    	ne.tipo
+	FROM voluntario v
+	JOIN persona p ON p.id_persona = v.id_persona
+	JOIN nivel_educacion ne ON ne.id_nvl_edu = v.id_nvl_edu
+"""
+
+
 @app.route("/voluntarios")
 def voluntarios():
-    voluntarios_data = {
-        "columns": [
-            {"id": "ID", "name": "ID"},
-            {"id": "Nombre", "name": "Nombre"},
-            {"id": "Edad", "name": "Edad"},
-            {"id": "Telefono", "name": "Teléfono"},
-        ],
-        "data": [
-            {"ID": 1, "Nombre": "Andrea Flores", "Edad": 19, "Telefono": "700-111"},
-            {"ID": 2, "Nombre": "Marco Rojas", "Edad": 21, "Telefono": "700-222"},
-            {"ID": 3, "Nombre": "Lucía Ramos", "Edad": 17, "Telefono": "700-333"},
-        ],
-    }
-    return render_template("voluntarios.html", data=voluntarios_data)
+    columnas = [
+        {"id": "id_voluntario", "name": "ID"},
+        {"id": "nombre_completo", "name": "Nombre Completo"},
+        {"id": "correo", "name": "Correo"},
+        {"id": "tipo", "name": "Nivel de Educacion"},
+    ]
+    try:
+        query_sql = text("SELECT * FROM voluntarios_publico")
+        result_proxy = db.session.execute(query_sql)
+        datos_crudos = [dict(row) for row in result_proxy.mappings()]
+    except Exception as e:
+        print("Error en la consulta:", e)
+        datos_crudos = []
+
+    voluntarios_data = {"columns": columnas, "data": datos_crudos}
+
+    return render_template("voluntarios/index.html", data=voluntarios_data)
+
+
+"""
+CREATE OR ALTER VIEW tutores_publico
+AS
+	SELECT 	t.id_tutor,
+    		(((p.nombre::text || ' '::text) || p.paterno::text) || ' '::text) || p.materno::text AS nombre_completo,
+    		t.parentesco
+	FROM tutor t
+	JOIN persona p ON p.id_persona = t.id_persona;
+"""
 
 
 @app.route("/tutores")
 def tutores():
-    tutores_data = {
-        "columns": [
-            {"id": "ID", "name": "ID"},
-            {"id": "Nombre", "name": "Nombre"},
-            {"id": "Telefono", "name": "Teléfono"},
-        ],
-        "data": [
-            {"ID": 1, "Nombre": "Carlos Rivas", "Telefono": "777-111"},
-            {"ID": 2, "Nombre": "Marcela López", "Telefono": "777-222"},
-            {"ID": 3, "Nombre": "Pedro Silva", "Telefono": "777-333"},
-        ],
-    }
-    return render_template("tutores.html", data=tutores_data)
+    columnas = [
+        {"id": "id_tutor", "name": "ID"},
+        {"id": "nombre_completo", "name": "Nombre Completo"},
+        {"id": "parentesco", "name": "Parentesco"},
+    ]
+
+    try:
+        query_sql = text("SELECT * FROM tutores_publico")
+        result_proxy = db.session.execute(query_sql)
+        datos_crudos = [dict(row) for row in result_proxy.mappings()]
+    except Exception as e:
+        print("Error en la consulta:", e)
+        datos_crudos = []
+
+    tutores_data = {"columns": columnas, "data": datos_crudos}
+
+    return render_template("tutores/index.html", data=tutores_data)
 
 
 # endregion
@@ -146,9 +185,42 @@ def asignaciones():
     return render_template("asignaciones.html")
 
 
+"""
+CREATE OR ALTER VIEW aportes_publico
+AS
+	SELECT 	a.id_aporte,a.monto_total, a.descripcion, a.f_creacion, a.f_edicion,
+    p.nombre||' '||p.paterno::text)||' '||p.materno AS nombre_completo
+   	FROM aporte a
+	JOIN participante pa ON pa.id_participante = a.id_participante
+	JOIN persona p ON p.id_persona = pa.id_persona;
+"""
+
+
 @app.route("/aportes")
 def aportes():
-    return render_template("aportes/index.html")
+    # Definimos las columnas que queremos mostrar
+    columnas = [
+        {"id": "id_aporte", "name": "ID"},
+        {"id": "monto_total", "name": "Monto Total"},
+        {"id": "descripcion", "name": "Descripción"},
+        {"id": "f_creacion", "name": "Fecha de Creación"},
+        {"id": "f_edicion", "name": "Fecha de Edición"},
+        {"id": "nombre_completo", "name": "Participante"},
+    ]
+
+    try:
+        query_sql = text("SELECT * FROM aportes_publico")
+        result_proxy = db.session.execute(query_sql)
+        datos_crudos = [dict(row) for row in result_proxy.mappings()]
+    except Exception as e:
+        print("Error en la consulta:", e)
+        datos_crudos = []
+
+    # Armamos la estructura final
+    aportes_data = {"columns": columnas, "data": datos_crudos}
+
+    # Pasamos la estructura al template
+    return render_template("aportes/index.html", data=aportes_data)
 
 
 # endregion

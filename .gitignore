@@ -11,3 +11,5 @@ wheels/
 
 # Other files or directories to ignore
 .env
+
+venv

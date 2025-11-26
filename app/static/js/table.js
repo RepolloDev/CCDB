@@ -1,3 +1,4 @@
+// Función para generar slug (sin cambios)
 function generateSlug(text) {
   return text
     .toString()
@@ -9,60 +10,71 @@ function generateSlug(text) {
     .replace(/-+$/, ""); // Trim - from end of text
 }
 
+// Función para crear la tabla (simplificada: usa data directamente)
 function createTable(columns, data, elementId) {
   console.log("Creating table with columns:", columns);
   const tableElement = document.getElementById(elementId);
+
+  // Validaciones
+  if (!columns || !Array.isArray(columns)) {
+    console.error("Error: 'columns' is undefined or not an array. Cannot create table.");
+    return;
+  }
+  if (!data || !Array.isArray(data)) {
+    console.error("Error: 'data' is undefined or not an array. Cannot create table.");
+    return;
+  }
+
+  // Opcional: Limpiar valores null/undefined en data para evitar errores en sorting
+  const cleanedData = data.map(row => {
+    if (!row || typeof row !== 'object') {
+      console.warn("Warning: Row is not an object:", row);
+      return {};
+    }
+    const cleanedRow = {};
+    Object.keys(row).forEach(key => {
+      cleanedRow[key] = row[key] ?? ""; // Convierte null/undefined a ""
+    });
+    return cleanedRow;
+  });
+
+  console.log("Cleaned data:", cleanedData);
+
+  // Configurar columnas para Grid.js: usa c.name y c.id
+  const gridColumns = columns.map(c => {
+    if (!c || !c.name || !c.id) {
+      console.warn("Warning: Column is invalid (missing name or id):", c);
+      return { name: "Unknown" };
+    }
+    return { name: c.name, id: c.id }; // 'id' mapea a la key del objeto
+  });
+
+  // Crear la tabla
+  if (cleanedData.length === 0) {
+    console.warn("Warning: No data to display in the table.");
+    tableElement.innerHTML = "<p>No data available.</p>";
+    return;
+  }
+
   const grid = new gridjs.Grid({
-    data,
+    data: cleanedData,  // Array de objetos directamente
     columns: [
-      ...columns,
+      ...gridColumns,
       {
         name: "Acciones",
         sort: false,
-        formatter: (cell, row) => {
-          return gridjs.html(
-            `
-                    <button class="btn btn-info" data-id="${row.cells[0].data}">Editar</button>
-                    <button class="btn btn-error" data-id="${row.cells[0].data}">Eliminar</button>
-                    `
-          );
+        formatter: (_, row) => {
+          // Usa row.id_participante (ajusta si el ID no es este campo)
+          return gridjs.html(`
+            <button class="btn btn-info" data-id="${row.id_participante}">Editar</button>
+            <button class="btn btn-error" data-id="${row.id_participante}">Eliminar</button>
+          `);
         },
       },
     ],
-    autoWidth: true,
-    fixedHeader: true,
-    pagination: {
-      enabled: true,
-      limit: 10,
-      summary: true,
-    },
-    search: {
-      enabled: true,
-    },
+    pagination: { enabled: true, limit: 10, summary: true },
+    search: { enabled: true },
     sort: true,
-    className: {
-      table: "table table-zebra bg-base-100 rounded-xl border border-base-300",
-      th: "bg-base-200",
-      td: "bg-base-100",
-      tr: "hover",
-      search: "ml-1 my-4 input input-lg box-border",
-      footer: "flex w-full my-4",
-      pagination: "join ml-auto",
-      paginationSummary: "mx-2 self-center",
-      paginationButton: "join-item btn btn-lg box-border",
-      paginationButtonCurrent: "btn-accent",
-    },
-    language: {
-      search: {
-        placeholder: "🔍 Buscar...",
-      },
-      pagination: {
-        previous: "Anterior",
-        next: "Siguiente",
-        showing: "Mostrando",
-        results: () => "Entradas",
-      },
-    },
   });
 
   grid.render(tableElement);
