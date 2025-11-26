@@ -19,6 +19,8 @@ DATABASE_URL = (
     f"postgresql://{db_user}:{db_password_quoted}@{db_host}:{db_port}/{db_name}"
 )
 
+#HOLA SOY LA ESQUIVEL 
+
 # para asegurarme de que el url de conexion es exitosa con el postgres
 print("DATABASE_URL:", DATABASE_URL)
 
