@@ -64,7 +64,7 @@ AS
 @app.route("/participantes")
 def participantes():
     # Definimos las columnas que queremos mostrar
-    columnas = [
+    cols = [
         {"id": "id_participante", "name": "ID"},
         {"id": "nombre_completo", "name": "Nombre"},
         {"id": "ci", "name": "Carnet"},
@@ -85,11 +85,10 @@ def participantes():
         datos_crudos = []
 
     # Armamos la estructura final
-    participantes_data = {"columns": columnas, "data": datos_crudos}
+    data = {"cols": cols, "rows": datos_crudos}
 
     # Pasamos la estructura al template
-    return render_template("participantes/index.html", data=participantes_data)
-
+    return render_template("participantes/index.html", data=data)
 
 """
 CREATE OR ALTER VIEW voluntarios_publico
