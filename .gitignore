@@ -11,5 +11,5 @@ wheels/
 
 # Other files or directories to ignore
 .env
-
+.vscode
 venv
