@@ -63,7 +63,7 @@ def home():
     )
 
 
-# region PERSONAS
+# region PARTICIPANTES
 
 """
 CREATE OR REPLACE VIEW participantes_publico
@@ -78,35 +78,20 @@ AS
 
 @app.route("/participantes")
 def participantes():
-    # Definimos las columnas que queremos mostrar
-    columnas = [
-        {"id": "id_participante", "name": "ID"},
-        {"id": "nombre_completo", "name": "Nombre"},
-        {"id": "ci", "name": "Carnet"},
-        {"id": "matricula", "name": "Matricula"},
-        {"id": "estado", "name": "Estado"},
-        {"id": "datos_tutor", "name": "Tutor"},
-    ]
-
     try:
         query_sql = text("SELECT * FROM participantes_publico")
         result_proxy = db.session.execute(query_sql)
         datos_crudos = [
-            {k: (v if v is not None else "") for k, v in row.items()}
+            [row["id_participante"], row["nombre_completo"], row["ci"], row["matricula"], row["estado"], row["datos_tutor"]]
             for row in result_proxy.mappings()
         ]
     except Exception as e:
         print("Error en la consulta:", e)
         datos_crudos = []
 
-    # Armamos la estructura final
-    participantes_data = {
-        "columns": columnas,
-        "data": datos_crudos
-    }
+    return render_template("participantes/index.html", data=datos_crudos)
 
-    # Pasamos la estructura al template
-    return render_template("participantes/index.html", data=participantes_data)
+
 
 """
 CREATE OR ALTER VIEW voluntarios_publico
@@ -121,27 +106,18 @@ AS
 """
 @app.route("/voluntarios")
 def voluntarios():
-
-    columnas = [
-            {"id": "id_voluntario", "name": "ID"},
-            {"id": "nombre_completo", "name": "Nombre Completo"},
-            {"id": "correo", "name": "Correo"},
-            {"id": "tipo", "name": "Nivel de Educacion"},
-    ]
     try:
         query_sql = text("SELECT * FROM voluntarios_publico")
         result_proxy = db.session.execute(query_sql)
-        datos_crudos = [dict(row) for row in result_proxy.mappings()]
+        datos_crudos = [
+            [row["id_voluntario"],row["nombre_completo"],row["correo"],row["tipo"]]
+            for row in result_proxy.mappings()
+        ]
     except Exception as e:
         print("Error en la consulta:", e)
         datos_crudos = []
 
-    voluntarios_data = {
-        "columns": columnas,
-        "data": datos_crudos
-    }
-
-    return render_template("voluntarios/index.html", data=voluntarios_data)
+    return render_template("voluntarios/index.html", data=datos_crudos)
 
 
 """
@@ -155,27 +131,18 @@ AS
 """
 @app.route("/tutores")
 def tutores():
-
-    columnas = [
-            {"id": "id_tutor", "name": "ID"},
-            {"id": "nombre_completo", "name": "Nombre Completo"},
-            {"id": "parentesco", "name": "Parentesco"},
-    ]
- 
     try:
         query_sql = text("SELECT * FROM tutores_publico")
         result_proxy = db.session.execute(query_sql)
-        datos_crudos = [dict(row) for row in result_proxy.mappings()]
+        datos_crudos = [
+            [row["id_tutor"],row["nombre_completo"],row["parentesco"]]
+            for row in result_proxy.mappings()
+        ]
     except Exception as e:
         print("Error en la consulta:", e)
         datos_crudos = []
-    
-    tutores_data = {
-        "columns": columnas,
-        "data": datos_crudos
-    }
 
-    return render_template("tutores/index.html", data=tutores_data)
+    return render_template("tutores/index.html", data=datos_crudos)
 
 
 # endregion
@@ -217,21 +184,12 @@ AS
 """
 @app.route("/aportes")
 def aportes():
-
-    # Definimos las columnas que queremos mostrar
-    columnas = [
-        {"id": "id_aporte", "name": "ID"},
-        {"id": "monto_total", "name": "Monto Total"},
-        {"id": "descripcion", "name": "Descripción"},
-        {"id": "f_creacion", "name": "Fecha de Creación"},
-        {"id": "f_edicion", "name": "Fecha de Edición"},
-        {"id": "nombre_completo", "name": "Participante"},
-    ]
-
     try:
         query_sql = text("SELECT * FROM aportes_publico")
         result_proxy = db.session.execute(query_sql)
-        datos_crudos = [dict(row) for row in result_proxy.mappings()]
+        datos_crudos = [
+            dict(row) for row in result_proxy.mappings()
+        ]
     except Exception as e:
         print("Error en la consulta:", e)
         datos_crudos = []
