@@ -1,29 +1,12 @@
 from flask import Flask, render_template
-import os
 from sqlalchemy import text
-from urllib.parse import quote_plus
-from flask_sqlalchemy import SQLAlchemy
-from dotenv import load_dotenv
-
-load_dotenv()
-
-db_user = os.getenv("DB_USER")
-db_password = os.getenv("DB_PASSWORD")
-db_host = os.getenv("DB_HOST")
-db_port = os.getenv("DB_PORT")
-db_name = os.getenv("DB_NAME")
-
-db_password_quoted = quote_plus(db_password)
-
-DATABASE_URL = (
-    f"postgresql://{db_user}:{db_password_quoted}@{db_host}:{db_port}/{db_name}"
-)
+from .db import Database
+from .routes.cursos_talleres import cursos_talleres_bp
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db = Database.init_app(app)
 
-db = SQLAlchemy(app)
+app.register_blueprint(cursos_talleres_bp)
 
 
 @app.route("/test")
@@ -73,6 +56,7 @@ AS
 			JOIN persona p ON p.id_persona = t.id_persona) tx ON tx.id_tutor = p.id_tutor
 """
 
+
 @app.route("/participantes")
 def participantes():
     # Definimos las columnas que queremos mostrar
@@ -93,10 +77,7 @@ def participantes():
     datos_crudos = [dict(row) for row in result_proxy.mappings()]
 
     # Armamos la estructura final
-    participantes_data = {
-        "columns": columnas,
-        "data": datos_crudos
-    }
+    participantes_data = {"columns": columnas, "data": datos_crudos}
 
     # Pasamos la estructura al template
     return render_template("participantes/index.html", data=participantes_data)
@@ -141,9 +122,9 @@ def tutores():
 
 
 # region Actividades
-@app.route("/cursos_talleres")
-def cursos_talleres():
-    return render_template("cursos_talleres.html")
+# @app.route("/cursos_talleres")
+# def cursos_talleres():
+#     return render_template("cursos_talleres/index.html")
 
 
 @app.route("/servicios")
@@ -167,7 +148,7 @@ def asignaciones():
 
 @app.route("/aportes")
 def aportes():
-    return render_template("aportes.html")
+    return render_template("aportes/index.html")
 
 
 # endregion
