@@ -1,106 +1,180 @@
+<!-- Sidebar en dos columnas -->
 <aside
   id="sidebar-container"
-  class="sidebar-container bg-base-200 min-h-screen w-80 py-8 flex flex-col"
+  class="sidebar-container fixed left-0 top-0 z-30 h-screen flex transition-all duration-300 ease-in-out w-16 bg-base-200"
 >
-  <div
-    class="sidebar-header navbar sticky top-0 z-20 hidden items-center gap-2 px-4 py-0 backdrop-blur lg:flex"
-  >
-    <a
-      href="/"
-      class="-ms-2 me-2 flex w-full shrink-0 items-center justify-center gap-2"
-    >
-      <img
-        src="{{ url_for('static', filename='logo.svg') }}"
-        alt="Logo"
-        class="h-16 w-16"
-      />
-      <div class="font-semibold flex flex-col justify-center">
-        <span class="text-2xl">Centro Cultural</span>
-        <span class="text-lg -mt-2">Don Bosco</span>
-      </div>
-    </a>
+  <!-- Columna izquierda: Sidebar compacto -->
+  <div class="sidebar-compact w-16 h-full bg-base-200 flex flex-col items-center py-8 space-y-4">
+    <!-- Ícono para Inicio -->
+    <div class="sidebar-icon cursor-pointer p-2 rounded-lg hover:bg-gray-300 transition-colors duration-200" data-target="inicio">
+      <box-icon name="grid-alt" type="solid" class="text-gray-700 text-xl"></box-icon>
+    </div>
+    <!-- Ícono para Personas -->
+    <div class="sidebar-icon cursor-pointer p-2 rounded-lg hover:bg-gray-300 transition-colors duration-200" data-target="personas">
+      <box-icon name="user" class="text-gray-700 text-xl"></box-icon>
+    </div>
+    <!-- Ícono para Actividades -->
+    <div class="sidebar-icon cursor-pointer p-2 rounded-lg hover:bg-gray-300 transition-colors duration-200" data-target="actividades">
+      <box-icon name="task" class="text-gray-700 text-xl"></box-icon>
+    </div>
+    <!-- Ícono para Operaciones -->
+    <div class="sidebar-icon cursor-pointer p-2 rounded-lg hover:bg-gray-300 transition-colors duration-200" data-target="operaciones">
+      <box-icon name="rocket" class="text-gray-700 text-xl"></box-icon>
+    </div>
+    <!-- Ícono para Organización -->
+    <div class="sidebar-icon cursor-pointer p-2 rounded-lg hover:bg-gray-300 transition-colors duration-200" data-target="organizacion">
+      <box-icon name="calendar" class="text-gray-700 text-xl"></box-icon>
+    </div>
+    <!-- Espacio para empujar logout abajo -->
+    <div class="flex-grow"></div>
+    <!-- Ícono para Cerrar sesión -->
+    <div class="sidebar-icon cursor-pointer p-2 rounded-lg hover:bg-gray-300 transition-colors duration-200" data-target="logout">
+      <box-icon name="log-out" rotate="180" class="text-gray-700 text-xl"></box-icon>
+    </div>
   </div>
-  <div class="h-8"></div>
-  <ul class="sidebar-nav menu menu-xl w-full px-4 py-0">
-    <li>
-      <a href="/">
-        <box-icon name="grid-alt" type="solid"></box-icon>
-        Inicio
+
+  <!-- Columna derecha: Menú expandido (inicialmente oculta) -->
+  <div class="sidebar-expanded w-64 h-full bg-white hidden flex-col py-8 px-4 shadow-lg">
+    <!-- Header -->
+    <div class="sidebar-header mb-6">
+      <a href="/" class="flex items-center gap-3">
+        <img
+          src="{{ url_for('static', filename='logo.svg') }}"
+          alt="Logo"
+          class="h-10 w-10"
+        />
+        <div class="font-semibold">
+          <span class="text-lg text-gray-800">Centro Cultural</span>
+          <br>
+          <span class="text-sm text-gray-600">Don Bosco</span>
+        </div>
       </a>
-    </li>
-    <li class="submenu">
-      <details>
-        <summary>
-          <box-icon name="user"></box-icon>
-          Personas
-        </summary>
-        <ul>
-          <li><a href="/participantes">Participantes</a></li>
-          <li><a href="/voluntarios">Voluntarios</a></li>
-          <li><a href="/tutores">Tutores</a></li>
+    </div>
+
+    <!-- Navegación expandida -->
+    <div class="flex-grow">
+      <!-- Inicio -->
+      <div id="menu-inicio" class="menu-section hidden">
+        <h3 class="text-gray-800 font-medium mb-2">Inicio</h3>
+        <ul class="space-y-1">
+          <li><a href="/" class="block px-3 py-2 rounded-md bg-blue-100 text-blue-800">Inicio</a></li>
         </ul>
-      </details>
-    </li>
-    <li class="submenu">
-      <details>
-        <summary>
-          <box-icon name="task"></box-icon>
-          Actividades
-        </summary>
-        <ul>
-          <li><a href="/cursos_talleres">Cursos/Talleres</a></li>
-          <li><a href="/servicios">Servicios</a></li>
+      </div>
+
+      <!-- Personas -->
+      <div id="menu-personas" class="menu-section hidden">
+        <h3 class="text-gray-800 font-medium mb-2">Personas</h3>
+        <ul class="space-y-1 ml-4">
+          <li><a href="/participantes" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-800">Participantes</a></li>
+          <li><a href="/voluntarios" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-800">Voluntarios</a></li>
+          <li><a href="/tutores" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-800">Tutores</a></li>
         </ul>
-      </details>
-    </li>
-    <li class="submenu">
-      <details>
-        <summary>
-          <box-icon name="rocket"></box-icon>
-          Operaciones
-        </summary>
-        <ul>
-          <li><a href="/inscripciones">Inscripciones</a></li>
-          <li><a href="/asignaciones">Asignaciones</a></li>
-          <li><a href="/aportes">Aportes</a></li>
+      </div>
+
+      <!-- Actividades -->
+      <div id="menu-actividades" class="menu-section hidden">
+        <h3 class="text-gray-800 font-medium mb-2">Actividades</h3>
+        <ul class="space-y-1 ml-4">
+          <li><a href="/cursos_talleres" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-800">Cursos/Talleres</a></li>
+          <li><a href="/servicios" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-800">Servicios</a></li>
         </ul>
-      </details>
-    </li>
-    <li class="submenu">
-      <details>
-        <summary>
-          <box-icon name="calendar"></box-icon>
-          Organización
-        </summary>
-        <ul>
-          <li><a href="/periodos">Periodos</a></li>
-          <li><a href="/salones">Salones</a></li>
-          <li><a href="/horarios">Horarios</a></li>
+      </div>
+
+      <!-- Operaciones -->
+      <div id="menu-operaciones" class="menu-section hidden">
+        <h3 class="text-gray-800 font-medium mb-2">Operaciones</h3>
+        <ul class="space-y-1 ml-4">
+          <li><a href="/inscripciones" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-800">Inscripciones</a></li>
+          <li><a href="/asignaciones" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-800">Asignaciones</a></li>
+          <li><a href="/aportes" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-800">Aportes</a></li>
         </ul>
-      </details>
-    </li>
-  </ul>
-  <a href="/login" class="btn btn-lg btn-error mt-auto w-5/6 mx-auto">
-    <box-icon name="log-out" rotate="180"></box-icon>
-    Cerrar sesión</a
-  >
+      </div>
+
+      <!-- Organización -->
+      <div id="menu-organizacion" class="menu-section hidden">
+        <h3 class="text-gray-800 font-medium mb-2">Organización</h3>
+        <ul class="space-y-1 ml-4">
+          <li><a href="/periodos" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-800">Periodos</a></li>
+          <li><a href="/salones" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-800">Salones</a></li>
+          <li><a href="/horarios" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-800">Horarios</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Cerrar sesión -->
+    <div id="menu-logout" class="menu-section hidden">
+      <a href="/login" class="btn btn-lg btn-error w-full flex items-center justify-center gap-2 text-white rounded-lg">
+        <box-icon name="log-out" rotate="180" class="text-white"></box-icon>
+        Cerrar sesión
+      </a>
+    </div>
+  </div>
 </aside>
 
+<!-- Contenedor principal del contenido (agrega esto en tu HTML principal) -->
+<main id="main-content" class="transition-all duration-300 ease-in-out ml-16">
+  <!-- Tu contenido aquí -->
+</main>
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const detailsElements = document.querySelectorAll("#sidebar-container details");
+    const sidebar = document.getElementById('sidebar-container');
+    const mainContent = document.getElementById('main-content');
+    const sidebarIcons = document.querySelectorAll('.sidebar-icon');
+    const menuSections = document.querySelectorAll('.menu-section');
 
-    detailsElements.forEach((detail) => {
-      detail.addEventListener("toggle", () => {
-        if (detail.open) {
-          // Cierra todos los demás
-          detailsElements.forEach((other) => {
-            if (other !== detail) {
-              other.removeAttribute("open");
-            }
-          });
-        }
+    let isExpanded = false;
+    let activeTarget = null;
+
+    function toggleSidebar(target) {
+      if (activeTarget === target && isExpanded) {
+        // Si ya está expandido y es el mismo, colapsar
+        collapseSidebar();
+      } else {
+        // Expandir y mostrar el menú correspondiente
+        expandSidebar(target);
+      }
+    }
+
+    function expandSidebar(target) {
+      isExpanded = true;
+      sidebar.classList.remove('w-16');
+      sidebar.classList.add('w-80'); // 16 + 64 = 80 (256px + 64px)
+      mainContent.classList.remove('ml-16');
+      mainContent.classList.add('ml-80');
+      document.querySelector('.sidebar-expanded').classList.remove('hidden');
+      showMenu(target);
+      activeTarget = target;
+    }
+
+    function collapseSidebar() {
+      isExpanded = false;
+      sidebar.classList.remove('w-80');
+      sidebar.classList.add('w-16');
+      mainContent.classList.remove('ml-80');
+      mainContent.classList.add('ml-16');
+      document.querySelector('.sidebar-expanded').classList.add('hidden');
+      hideAllMenus();
+      activeTarget = null;
+    }
+
+    function showMenu(target) {
+      hideAllMenus();
+      const menu = document.getElementById(`menu-${target}`);
+      if (menu) {
+        menu.classList.remove('hidden');
+      }
+    }
+
+    function hideAllMenus() {
+      menuSections.forEach(section => section.classList.add('hidden'));
+    }
+
+    // Event listeners para íconos
+    sidebarIcons.forEach(icon => {
+      icon.addEventListener('click', () => {
+        const target = icon.getAttribute('data-target');
+        toggleSidebar(target);
       });
     });
   });

@@ -19,21 +19,24 @@ def crear():
         return render_template("tutores/form.html", tutor=None)
 
     data = get_data()
-    
-    # Crear persona primero
-    id_persona = execute(db, """
-        INSERT INTO persona(nombre, paterno, materno, ci, genero, f_nacimiento)
-        VALUES(:nombre, :paterno, :materno, :ci, :genero, :f_nacimiento)
-        RETURNING id_persona
-    """, data)
-    
-    # Crear tutor
-    execute(db, """
-        INSERT INTO tutor(id_persona, parentesco)
-        VALUES(:id_persona, :parentesco)
-    """, {"id_persona": id_persona, "parentesco": data.get("parentesco", "")})
-    
+
+    # Llamada al procedimiento almacenado
+    tutor_id = execute(db, """
+        SELECT fnCrearTutor(
+            :nombre, :paterno, :materno, :ci, :genero, :f_nacimiento, :parentesco
+        )
+    """, {
+        "nombre": data.get("nombre"),
+        "paterno": data.get("paterno"),
+        "materno": data.get("materno", ""),
+        "ci": data.get("ci"),
+        "genero": data.get("genero", ""),
+        "f_nacimiento": data.get("f_nacimiento"),
+        "parentesco": data.get("parentesco", "")
+    })
+
     return respond("Tutor creado", redirect_to=url_for("tutores.index"), status=201)
+
 
 
 @tutores_bp.route("/editar/<int:id>", methods=["GET", "POST"])
