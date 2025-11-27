@@ -130,10 +130,40 @@ def home():
         print("Error en la consulta", e)
         chart_area_data = {}
 
-    chart_donut_data = {
-        "series": [80, 10, 10],
-        "labels": ["< 18", "18 - 35", "> 35"],
-    }
+    try:
+        # --- consulta para distribución de edades ---
+        query_sql = text("""
+            SELECT
+                SUM(CASE WHEN EXTRACT(YEAR FROM AGE(current_date, p.f_nacimiento)) < 18 THEN 1 ELSE 0 END) AS menores_18,
+                SUM(CASE WHEN EXTRACT(YEAR FROM AGE(current_date, p.f_nacimiento)) BETWEEN 18 AND 35 THEN 1 ELSE 0 END) AS entre_18_35,
+                SUM(CASE WHEN EXTRACT(YEAR FROM AGE(current_date, p.f_nacimiento)) > 35 THEN 1 ELSE 0 END) AS mayores_35
+            FROM aporte a
+            JOIN participante pa ON a.id_participante = pa.id_participante
+            JOIN persona p ON pa.id_persona = p.id_persona
+        """)
+        result_proxy = db.session.execute(query_sql).fetchone()
+        menores_18, entre_18_35, mayores_35 = result_proxy
+
+        total = (menores_18 or 0) + (entre_18_35 or 0) + (mayores_35 or 0)
+
+        if total > 0:
+            porc_menores = round((menores_18 / total) * 100, 2)
+            porc_18_35 = round((entre_18_35 / total) * 100, 2)
+            porc_mayores = round((mayores_35 / total) * 100, 2)
+        else:
+            porc_menores, porc_18_35, porc_mayores = 0, 0, 0
+
+        chart_donut_data = {
+            "series": [porc_menores, porc_18_35, porc_mayores],
+            "labels": ["< 18", "18 - 35", "> 35"],
+        }
+
+    except Exception as e:
+        print("Error en la consulta de edades:", e)
+        chart_donut_data = {
+            "series": [0, 0, 0],
+            "labels": ["< 18", "18 - 35", "> 35"],
+        }
 
     return render_template(
         "inicio.html",
