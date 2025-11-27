@@ -20,7 +20,6 @@ def index():
         total_menores=menores
     )
 
-
 @voluntarios_bp.route("/crear", methods=["GET", "POST"])
 def crear():
     if request.method == "GET":
@@ -29,65 +28,30 @@ def crear():
 
     data = get_data()
 
-    # Normalizar id_nvl_edu
     id_nvl_edu = data.get("id_nvl_edu") or None
 
-    # Buscar o crear persona
-    try:
-        persona = query_one(db, "SELECT id_persona FROM persona WHERE ci = :ci", {"ci": data.get("ci")})
-        execute(db, """
-            UPDATE persona
-            SET nombre = :nombre, paterno = :paterno, materno = :materno,
-                celular = :celular, genero = :genero, f_nacimiento = :fn,
-                zona = :zona, calle = :calle, nro = :nro, f_edicion = now()
-            WHERE id_persona = :idp
-        """, {
-            "nombre": data.get("nombre"),
-            "paterno": data.get("paterno"),
-            "materno": data.get("materno", ""),
-            "celular": data.get("celular", ""),
-            "genero": data.get("genero", ""),
-            "fn": data.get("fecha_nacimiento"),
-            "zona": data.get("zona", ""),
-            "calle": data.get("barrio", ""),
-            "nro": data.get("nro_casa", ""),
-            "idp": persona["id_persona"]
-        })
-        id_persona = persona["id_persona"]
-    except:
-        id_persona = execute(db, """
-            INSERT INTO persona (nombre, paterno, materno, ci, celular, genero, f_nacimiento, zona, calle, nro)
-            VALUES (:nombre, :paterno, :materno, :ci, :celular, :genero, :fn, :zona, :calle, :nro)
-            RETURNING id_persona
-        """, {
-            "nombre": data.get("nombre"),
-            "paterno": data.get("paterno"),
-            "materno": data.get("materno", ""),
-            "ci": data.get("ci"),
-            "celular": data.get("celular", ""),
-            "genero": data.get("genero", ""),
-            "fn": data.get("fecha_nacimiento"),
-            "zona": data.get("zona", ""),
-            "calle": data.get("barrio", ""),
-            "nro": data.get("nro_casa", ""),
-        })
-
-    # Verificar si ya existe voluntario
-    try:
-        existing = query_one(db, "SELECT id_voluntario FROM voluntario WHERE id_persona = :idp", {"idp": id_persona})
-        execute(db, "UPDATE voluntario SET correo = :correo, id_nvl_edu = :niv WHERE id_voluntario = :id", {
-            "correo": data.get("correo", ""),
-            "niv": id_nvl_edu,
-            "id": existing["id_voluntario"]
-        })
-    except:
-        execute(db, "INSERT INTO voluntario (id_persona, correo, id_nvl_edu) VALUES (:idp, :correo, :niv)", {
-            "idp": id_persona,
-            "correo": data.get("correo", ""),
-            "niv": id_nvl_edu
-        })
+    voluntario_id = execute(db, """
+        SELECT fnCrearVoluntario(
+            :nombre, :paterno, :materno, :ci, :celular, :genero, :fn,
+            :zona, :calle, :nro, :correo, :niv
+        )
+    """, {
+        "nombre": data.get("nombre"),
+        "paterno": data.get("paterno"),
+        "materno": data.get("materno"),
+        "ci": data.get("ci"),
+        "celular": data.get("celular"),
+        "genero": data.get("genero"),
+        "fn": data.get("fecha_nacimiento"),
+        "zona": data.get("zona"),
+        "calle": data.get("barrio"),
+        "nro": data.get("nro_casa"),
+        "correo": data.get("correo", ""),
+        "niv": id_nvl_edu
+    })
 
     return respond("Voluntario creado", redirect_to=url_for("voluntarios.index"), status=201)
+
 
 
 @voluntarios_bp.route("/editar/<int:id>", methods=["GET", "POST"])
