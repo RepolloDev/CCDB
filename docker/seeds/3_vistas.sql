@@ -18,3 +18,13 @@ join actividad a on a.id_actividad = ct.id_actividad
 join salon s on s.id_salon = a.id_salon
 join voluntario v on v.id_voluntario = ct.id_voluntario
 join persona p on p.id_persona = v.id_persona;
+
+CREATE OR REPLACE VIEW tutores_select
+ AS
+ SELECT t.id_tutor,
+    (((p.nombre::text || ' '::text) || p.paterno::text) || ' '::text) || p.materno::text AS nombre_completo,
+    t.parentesco
+   FROM tutor t
+     JOIN persona p ON p.id_persona = t.id_persona
+  GROUP BY t.id_tutor, p.nombre, p.paterno, p.materno, t.parentesco
+  ORDER BY ((((p.nombre::text || ' '::text) || p.paterno::text) || ' '::text) || p.materno::text);
