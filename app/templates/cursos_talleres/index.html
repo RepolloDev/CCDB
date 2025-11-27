@@ -1,12 +1,58 @@
-{% extends "layouts/dashboardLayout.html" %}
+{% extends "layouts/crudLayout.html" %}
 <!-- Title -->
 {% block title%}
 <span>Cursos y Talleres</span>
 {% endblock %}
 <!-- Content -->
 {% block content %}
-<span>Hola mundo</span>
+<div>
+  <!-- Statistics -->
+  <div class="stats border border-base-300 w-full">
+    <div class="stat">
+      <div class="stat-figure text-primary">
+        <box-icon type="solid" name="buildings" size="lg"></box-icon>
+      </div>
+      <div class="stat-title">Total de Cursos y Talleres</div>
+      <div class="stat-value text-primary">{{r1}}</div>
+      <div class="stat-desc">Registrados en todo el tiempo</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-figure text-secondary">
+        <box-icon type="solid" name="buildings" size="lg"></box-icon>
+      </div>
+      <div class="stat-title">Participantes activos</div>
+      <div class="stat-value text-secondary">51</div>
+      <div class="stat-desc">50% del total</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-figure text-secondary">
+        <box-icon type="solid" name="baby-carriage" size="lg"></box-icon>
+      </div>
+      <div class="stat-value">32</div>
+      <div class="stat-title">Menores de edad</div>
+      <div class="stat-desc text-secondary">31% del total</div>
+    </div>
+  </div>
+</div>
+<!-- Table -->
+<div>
+  <h2 class="my-8 text-2xl font-semibold">Vista general</h2>
+  <button class="btn btn-primary btn-lg mb-2" data-action="add">Agregar</button>
+  <!-- Table of participants -->
+  <div class="overflow-x-auto">
+    <div id="table-data"></div>
+  </div>
+</div>
 {% endblock %}
-<dialog>
-    
-</dialog>
+<!-- Scripts -->
+{% block scripts %}
+<script id="data" type="application/json">
+  {{ data | tojson  }}
+</script>
+<script>
+  initializeTable("table-data");
+  const BASE_URL = "/cursos_talleres";
+</script>
+{% endblock %}

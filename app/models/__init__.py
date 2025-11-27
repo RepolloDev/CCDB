@@ -1,1 +1,1 @@
-# MODELOS DE LA APLICACIÓN
+from .curso_taller import CursoTaller

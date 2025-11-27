@@ -2,6 +2,7 @@
 function createTable(columns, data, elementId) {
   console.log("Creating table with columns:", columns);
   const tableElement = document.getElementById(elementId);
+  tableElement.innerHTML = ""; // Limpiar contenido previo
 
   // Validaciones
   if (!columns || !Array.isArray(columns)) {
@@ -56,10 +57,11 @@ function createTable(columns, data, elementId) {
         name: "Acciones",
         sort: false,
         formatter: (_, row) => {
-          // Usa row.id_participante (ajusta si el ID no es este campo)
+          const id = row.cells[0].data;
+
           return gridjs.html(`
-            <button class="btn btn-info" data-id="${row.id_participante}">Editar</button>
-            <button class="btn btn-error" data-id="${row.id_participante}">Eliminar</button>
+            <button class="btn btn-info btn-modal" data-id="${id}" data-action="edit">Editar</button>
+            <button class="btn btn-error btn-modal" data-id="${id}" data-action="delete">Eliminar</button>
           `);
         },
       },
@@ -67,9 +69,11 @@ function createTable(columns, data, elementId) {
     pagination: { enabled: true, limit: 10, summary: true },
     search: { enabled: true },
     sort: true,
+    fixedHeader: true,
   });
 
   grid.render(tableElement);
+  grid.updateConfig({ data: cleanedData }).forceRender();
 }
 
 function initializeTable(
