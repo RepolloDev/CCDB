@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 from sqlalchemy import text
 from .db import Database
-from .routes.cursos_talleres import cursos_talleres_bp
+# from .routes.cursos_talleres import cursos_talleres_bp
 
 
 # para asegurarme de que el url de conexion es exitosa con el postgres
@@ -10,7 +10,7 @@ print("DATABASE_URL:", Database.make_database_uri())
 app = Flask(__name__)
 db = Database.init_app(app)
 
-app.register_blueprint(cursos_talleres_bp)
+# app.register_blueprint(cursos_talleres_bp)
 
 
 @app.route("/test")
@@ -47,7 +47,7 @@ def home():
     )
 
 
-# region PERSONAS
+# region PARTICIPANTES
 
 """
 CREATE OR REPLACE VIEW participantes_publico
@@ -63,32 +63,26 @@ AS
 
 @app.route("/participantes")
 def participantes():
-    # Definimos las columnas que queremos mostrar
-    cols = [
-        {"id": "id_participante", "name": "ID"},
-        {"id": "nombre_completo", "name": "Nombre"},
-        {"id": "ci", "name": "Carnet"},
-        {"id": "matricula", "name": "Matricula"},
-        {"id": "estado", "name": "Estado"},
-        {"id": "datos_tutor", "name": "Tutor"},
-    ]
-
     try:
         query_sql = text("SELECT * FROM participantes_publico")
         result_proxy = db.session.execute(query_sql)
         datos_crudos = [
-            {k: (v if v is not None else "") for k, v in row.items()}
+            [
+                row["id_participante"],
+                row["nombre_completo"],
+                row["ci"],
+                row["matricula"],
+                row["estado"],
+                row["datos_tutor"],
+            ]
             for row in result_proxy.mappings()
         ]
     except Exception as e:
         print("Error en la consulta:", e)
         datos_crudos = []
 
-    # Armamos la estructura final
-    data = {"cols": cols, "rows": datos_crudos}
+    return render_template("participantes/index.html", data=datos_crudos)
 
-    # Pasamos la estructura al template
-    return render_template("participantes/index.html", data=data)
 
 """
 CREATE OR ALTER VIEW voluntarios_publico
@@ -105,23 +99,18 @@ AS
 
 @app.route("/voluntarios")
 def voluntarios():
-    columnas = [
-        {"id": "id_voluntario", "name": "ID"},
-        {"id": "nombre_completo", "name": "Nombre Completo"},
-        {"id": "correo", "name": "Correo"},
-        {"id": "tipo", "name": "Nivel de Educacion"},
-    ]
     try:
         query_sql = text("SELECT * FROM voluntarios_publico")
         result_proxy = db.session.execute(query_sql)
-        datos_crudos = [dict(row) for row in result_proxy.mappings()]
+        datos_crudos = [
+            [row["id_voluntario"], row["nombre_completo"], row["correo"], row["tipo"]]
+            for row in result_proxy.mappings()
+        ]
     except Exception as e:
         print("Error en la consulta:", e)
         datos_crudos = []
 
-    voluntarios_data = {"columns": columnas, "data": datos_crudos}
-
-    return render_template("voluntarios/index.html", data=voluntarios_data)
+    return render_template("voluntarios/index.html", data=datos_crudos)
 
 
 """
@@ -137,37 +126,86 @@ AS
 
 @app.route("/tutores")
 def tutores():
-    columnas = [
-        {"id": "id_tutor", "name": "ID"},
-        {"id": "nombre_completo", "name": "Nombre Completo"},
-        {"id": "parentesco", "name": "Parentesco"},
-    ]
-
     try:
         query_sql = text("SELECT * FROM tutores_publico")
         result_proxy = db.session.execute(query_sql)
-        datos_crudos = [dict(row) for row in result_proxy.mappings()]
+        datos_crudos = [
+            [row["id_tutor"], row["nombre_completo"], row["parentesco"]]
+            for row in result_proxy.mappings()
+        ]
     except Exception as e:
         print("Error en la consulta:", e)
         datos_crudos = []
 
-    tutores_data = {"columns": columnas, "data": datos_crudos}
-
-    return render_template("tutores/index.html", data=tutores_data)
+    return render_template("tutores/index.html", data=datos_crudos)
 
 
 # endregion
 
 
 # region Actividades
-# @app.route("/cursos_talleres")
-# def cursos_talleres():
-#     return render_template("cursos_talleres/index.html")
+"""
+CREATE OR REPLACE VIEW cursos_talleres_publico
+AS
+	SELECT ct.id_curtal, a.cod_actividad, a.nombre, ct.enlace, p.nombre||' '||p.paterno||' '||p.materno AS voluntario
+	FROM curso_taller ct
+	JOIN actividad a ON a.id_actividad = ct.id_actividad
+	JOIN voluntario v ON v.id_voluntario = ct.id_voluntario
+	JOIN persona p ON p.id_persona = v.id_persona
+"""
+
+
+@app.route("/cursos_talleres")
+def cursos_talleres():
+    try:
+        query_sql = text("SELECT * FROM cursos_talleres_publico")
+        result_proxy = db.session.execute(query_sql)
+        datos_crudos = [
+            [
+                row["id_curtal"],
+                row["cod_actividad"],
+                row["nombre"],
+                row["enlace"],
+                row["voluntario"],
+            ]
+            for row in result_proxy.mappings()
+        ]
+    except Exception as e:
+        print("Error en la consulta: ", e)
+        datos_crudos = []
+
+    return render_template("cursos_talleres/index.html", data=datos_crudos)
+
+
+"""
+CREATE OR REPLACE VIEW servicios_publico
+AS
+	SELECT s.id_servicio, a.cod_actividad, a.nombre, s.tipo, s.estado
+	FROM servicio s 
+	JOIN actividad a ON a.id_actividad = s.id_actividad
+"""
 
 
 @app.route("/servicios")
 def servicios():
-    return render_template("servicios.html")
+    try:
+        query_sql = text("SELECT * FROM servicios_publico")
+        result_proxy = db.session.execute(query_sql)
+        datos_crudos = [
+            [
+                row["id_servicio"],
+                row["cod_actividad"],
+                row["nombre"],
+                row["tipo"],
+                row["estado"],
+            ]
+            for row in result_proxy.mappings()
+        ]
+    except Exception as e:
+        print("Error en la consulta:", e)
+        datos_crudos = []
+
+    return render_template("servicios/index.html", data=datos_crudos)
 
 
 # endregion
@@ -195,40 +233,58 @@ AS
 """
 
 
-@app.route("/aportes")
-def aportes():
-    # Definimos las columnas que queremos mostrar
-    columnas = [
-        {"id": "id_aporte", "name": "ID"},
-        {"id": "monto_total", "name": "Monto Total"},
-        {"id": "descripcion", "name": "Descripción"},
-        {"id": "f_creacion", "name": "Fecha de Creación"},
-        {"id": "f_edicion", "name": "Fecha de Edición"},
-        {"id": "nombre_completo", "name": "Participante"},
-    ]
+# @app.route("/aportes")
+# def aportes():
+#     try:
+#         query_sql = text("SELECT * FROM aportes_publico")
+#         result_proxy = db.session.execute(query_sql)
+#         datos_crudos = [dict(row) for row in result_proxy.mappings()]
+#     except Exception as e:
+#         print("Error en la consulta:", e)
+#         datos_crudos = []
 
-    try:
-        query_sql = text("SELECT * FROM aportes_publico")
-        result_proxy = db.session.execute(query_sql)
-        datos_crudos = [dict(row) for row in result_proxy.mappings()]
-    except Exception as e:
-        print("Error en la consulta:", e)
-        datos_crudos = []
+#     # Armamos la estructura final
+#     aportes_data = {"columns": columnas, "data": datos_crudos}
 
-    # Armamos la estructura final
-    aportes_data = {"columns": columnas, "data": datos_crudos}
-
-    # Pasamos la estructura al template
-    return render_template("aportes/index.html", data=aportes_data)
+#     # Pasamos la estructura al template
+#     return render_template("aportes/index.html", data=aportes_data)
 
 
 # endregion
 
 
 # region Organización
-@app.route("/periodos")
-def periodos():
-    return render_template("periodos.html")
+
+
+# @app.route("/periodos")
+# def periodos():
+#     try:
+#         query_sql = text("SELECT * FROM periodo")
+#         result_proxy = db.session.execute(query_sql)
+#         datos_crudos = []
+#         for row in result_proxy.mappings():
+#             datos_crudos.append(
+#                 [
+#                     row["id_periodo"],
+#                     datetime.strptime(
+#                         str(row["f_inicio"]), "%a, %d %b %Y %H:%M:%S %Z"
+#                     ).strftime("%d/%m/%Y"),
+#                     datetime.strptime(
+#                         str(row["f_fin"]), "%a, %d %b %Y %H:%M:%S %Z"
+#                     ).strftime("%d/%m/%Y"),
+#                     datetime.strptime(
+#                         str(row["f_creacion"]), "%a, %d %b %Y %H:%M:%S %Z"
+#                     ).strftime("%d/%m/%Y %H:%M"),
+#                     datetime.strptime(
+#                         str(row["f_edicion"]), "%a, %d %b %Y %H:%M:%S %Z"
+#                     ).strftime("%d/%m/%Y %H:%M"),
+#                 ]
+#             )
+#     except Exception as e:
+#         print("Error en la consulta:", e)
+#         datos_crudos = []
+
+#     return render_template("periodos/index.html", data=datos_crudos)
 
 
 @app.route("/salones")

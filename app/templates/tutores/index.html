@@ -54,13 +54,26 @@
 </script>
 
 <script>
-  const jsonData = JSON.parse(
-    document.getElementById("tutores-data").textContent
-  );
+  const jsonDataElement = document.getElementById("tutores-data");
+  const rawData = JSON.parse(jsonDataElement.textContent);
 
-  const columns = jsonData["columns"];
-  const data = jsonData["data"];
+  const grid = new gridjs.Grid({
+    columns: ['ID','Nombre Completo','Parentesco','Acciones'],
+    data: rawData.map(row =>[
+      row[0],
+      row[1], 
+      row[2], 
+      gridjs.html(`
+        <div class="flex gap-2">
+          <button class="btn btn-info" data-id="${row[0]}">Editar</button>
+          <button class="btn btn-error" data-id="${row[0]}">Eliminar</button>
+        </div>
+      `)
+    ]),
+    search: true,
+    pagination: {enabled: true, limit: 10}
+  });
 
-  createTable(columns, data, "tutores-table");
+  grid.render(document.getElementById("tutores-table"));
 </script>
 {% endblock %}
