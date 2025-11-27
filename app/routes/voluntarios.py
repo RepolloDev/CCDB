@@ -2,6 +2,7 @@
 from ..db import Database
 from ..utils import get_data, respond, query_one, query_all, query_values, execute
 from flask import Blueprint, render_template, url_for, request
+from sqlalchemy import text
 
 db = Database.db
 
@@ -11,7 +12,15 @@ voluntarios_bp = Blueprint("voluntarios", __name__, url_prefix="/voluntarios")
 @voluntarios_bp.route("/")
 def index():
     datos = query_values(db, "SELECT * FROM voluntarios_publico")
-    return render_template("voluntarios/index.html", data=datos)
+    total = fnTotalVoluntarios()
+    menores = fnTotalMenores()
+
+    return render_template(
+        "voluntarios/index.html",
+        data=datos,
+        total_voluntarios=total,
+        total_menores=menores
+    )
 
 
 @voluntarios_bp.route("/crear", methods=["GET", "POST"])
@@ -111,3 +120,16 @@ def eliminar(id):
 
     execute(db, "DELETE FROM voluntario WHERE id_voluntario = :id", {"id": id})
     return respond("Voluntario eliminado", redirect_to=url_for("voluntarios.index"))
+
+def fnTotalVoluntarios():
+    return db.session.execute(text("SELECT COUNT(*) FROM voluntario")).scalar()
+
+
+def fnTotalMenores():
+    sql = """
+        SELECT COUNT(*)
+        FROM voluntario v
+        JOIN persona pe ON pe.id_persona = v.id_persona
+        WHERE DATE_PART('year', AGE(pe.f_nacimiento)) < 18
+    """
+    return db.session.execute(text(sql)).scalar()

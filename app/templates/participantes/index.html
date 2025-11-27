@@ -12,7 +12,7 @@
         <box-icon name="user-plus" size="lg"></box-icon>
       </div>
       <div class="stat-title">Total de participantes</div>
-      <div class="stat-value text-primary">102</div>
+      <div class="stat-value text-primary">{{ total_participantes }}</div>
       <div class="stat-desc">Registrados en todo el tiempo</div>
     </div>
 
@@ -21,7 +21,7 @@
         <box-icon name="show" size="lg"></box-icon>
       </div>
       <div class="stat-title">Participantes activos</div>
-      <div class="stat-value text-secondary">51</div>
+      <div class="stat-value text-secondary">{{ total_activos }}</div>
       <div class="stat-desc">50% del total</div>
     </div>
 
@@ -29,7 +29,7 @@
       <div class="stat-figure text-secondary">
         <box-icon type="solid" name="baby-carriage" size="lg"></box-icon>
       </div>
-      <div class="stat-value">32</div>
+      <div class="stat-value">{{ total_menores }}</div>
       <div class="stat-title">Menores de edad</div>
       <div class="stat-desc text-secondary">31% del total</div>
     </div>

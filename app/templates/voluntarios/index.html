@@ -14,12 +14,22 @@
       <div class="stat-figure text-primary">
         <box-icon name="user-plus" size="lg"></box-icon>
       </div>
-      <div class="stat-title">Total de voluntarios</div>
-      <div class="stat-value text-primary">{{ data|length }}</div>
+      <div class="stat-title">Total de Voluntarios</div>
+      <div class="stat-value text-primary">{{ total_voluntarios }}</div>
       <div class="stat-desc">Registrados en todo el tiempo</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-figure text-secondary">
+        <box-icon type="solid" name="baby-carriage" size="lg"></box-icon>
+      </div>
+      <div class="stat-value">{{ total_menores }}</div>
+      <div class="stat-title">Menores de edad</div>
+      <div class="stat-desc text-secondary">31% del total</div>
     </div>
   </div>
 </div>
+
 
 <!-- ===== TABLA ===== -->
 <div>

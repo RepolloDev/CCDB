@@ -1,6 +1,7 @@
 from ..db import Database
 from ..utils import get_data, respond, query_one, query_all, query_values, execute
 from flask import Blueprint, render_template, url_for, request
+from sqlalchemy import text
 
 db = Database.db
 
@@ -10,7 +11,18 @@ participantes_bp = Blueprint("participantes", __name__, url_prefix="/participant
 @participantes_bp.route("/")
 def index():
     datos = query_values(db, "SELECT * FROM participantes_publico")
-    return render_template("participantes/index.html", data=datos)
+
+    total = fnTotalParticipantes()
+    activos = fnTotalActivos()
+    menores = fnTotalMenores()
+
+    return render_template(
+        "participantes/index.html",
+        data=datos,
+        total_participantes=total,
+        total_activos=activos,
+        total_menores=menores
+    )
 
 
 @participantes_bp.route("/crear", methods=["GET", "POST"])
@@ -125,3 +137,20 @@ def eliminar(id):
 
     execute(db, "DELETE FROM participante WHERE id_participante = :id", {"id": id})
     return respond("Participante eliminado", redirect_to=url_for("participantes.index"))
+
+def fnTotalParticipantes():
+    return db.session.execute(text("SELECT COUNT(*) FROM participante")).scalar()
+
+
+def fnTotalActivos():
+    return db.session.execute(text("SELECT COUNT(*) FROM participante WHERE estado = 'activo'")).scalar()
+
+
+def fnTotalMenores():
+    sql = """
+        SELECT COUNT(*)
+        FROM participante p
+        JOIN persona pe ON pe.id_persona = p.id_persona
+        WHERE DATE_PART('year', AGE(pe.f_nacimiento)) < 18
+    """
+    return db.session.execute(text(sql)).scalar()
