@@ -1,0 +1,41 @@
+<form id="form" class="p-2 h-full flex flex-col" action="{% if asignacion %}{{ url_for('asignaciones.editar', id=asignacion.id_vps) }}{% else %}{{ url_for('asignaciones.crear') }}{% endif %}" method="post">
+  <h1 class="text-2xl font-semibold mb-4">{% if asignacion %}Editar Asignación{% else %}Crear Asignación{% endif %}</h1>
+
+  {% if asignacion %}
+  <input type="hidden" name="id_vps" value="{{ asignacion.id_vps }}" />
+  {% endif %}
+
+  <div class="grid grid-cols-1 gap-4">
+    <div>
+      <label class="select w-full">
+        <span class="label">Servicio (Actividad)</span>
+        <select name="id_servicio" required>
+          <option value="">Seleccione servicio...</option>
+          {% for s in servicios %}
+          <option value="{{ s.id_servicio }}" {% if asignacion and asignacion.id_servicio == s.id_servicio %}selected{% endif %}>
+            {{ s.cod_actividad }} - {{ s.nombre }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <div>
+      <label class="select w-full">
+        <span class="label">Voluntario</span>
+        <select name="id_voluntario" required>
+          <option value="">Seleccione voluntario...</option>
+          {% for v in voluntarios %}
+          <option value="{{ v.id_voluntario }}" {% if asignacion and asignacion.id_voluntario == v.id_voluntario %}selected{% endif %}>
+            {{ v.nombre_completo }} - {{ v.correo or '' }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <div class="mt-auto btn btn-primary">
+    <button type="submit" class="btn btn-primary w-full">Guardar</button>
+  </div>
+</form>

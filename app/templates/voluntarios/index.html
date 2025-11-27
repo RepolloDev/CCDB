@@ -6,74 +6,55 @@
 
 <!-- Content -->
 {% block content %}
+
+<!-- ======= ESTADÍSTICAS (opcional) ======= -->
 <div>
-  <!-- Statistics -->
   <div class="stats border border-base-300 w-full">
     <div class="stat">
       <div class="stat-figure text-primary">
         <box-icon name="user-plus" size="lg"></box-icon>
       </div>
       <div class="stat-title">Total de voluntarios</div>
-      <div class="stat-value text-primary">102</div>
+      <div class="stat-value text-primary">{{ data|length }}</div>
       <div class="stat-desc">Registrados en todo el tiempo</div>
     </div>
-
-    <div class="stat">
-      <div class="stat-figure text-secondary">
-        <box-icon name="show" size="lg"></box-icon>
-      </div>
-      <div class="stat-title">Voluntarios activos</div>
-      <div class="stat-value text-secondary">51</div>
-      <div class="stat-desc">50% del total</div>
-    </div>
-
-    <div class="stat">
-      <div class="stat-figure text-secondary">
-        <box-icon type="solid" name="baby-carriage" size="lg"></box-icon>
-      </div>
-      <div class="stat-value">32</div>
-      <div class="stat-title">Menores de edad</div>
-      <div class="stat-desc text-secondary">31% del total</div>
-    </div>
   </div>
 </div>
 
-<!-- Table -->
+<!-- ===== TABLA ===== -->
 <div>
   <h2 class="my-8 text-2xl font-semibold">Vista general</h2>
+  <div class="mb-2">
+    <button
+      class="btn btn-primary btn-lg"
+      data-ref="{{ url_for('voluntarios.crear') }}"
+    >
+      Agregar
+    </button>
+  </div>
   <div class="overflow-x-auto">
-    <div id="voluntarios-table"></div>
+    <div id="table-data"></div>
   </div>
 </div>
-{% endblock %}
 
+{% endblock %}
 <!-- Scripts -->
 {% block scripts %}
-<script id="voluntarios-data" type="application/json">
+<script id="data" type="application/json">
   {{ data | tojson }}
 </script>
+
 <script>
-  const jsonDataElement = document.getElementById("voluntarios-data");
-  const rawData = JSON.parse(jsonDataElement.textContent);
+  const EDIT_URL_TEMPLATE = "{{ url_for('voluntarios.editar', id=0).replace('/0','/__ID__') }}";
+  const DELETE_URL_TEMPLATE = "{{ url_for('voluntarios.eliminar', id=0).replace('/0','/__ID__') }}";
+  const CREATE_URL = "{{ url_for('voluntarios.crear') }}";
 
-  const grid = new gridjs.Grid({
-    columns: ['ID','Nombre Completo','Correo','Nivel de Educacion','Acciones'],
-    data: rawData.map(row =>[
-      row[0],
-      row[1],
-      row[2],
-      row[3],
-      gridjs.html(`
-        <div class="flex gap-2">
-          <button class="btn btn-info" data-id="${row[0]}">Editar</button>
-          <button class="btn btn-error" data-id="${row[0]}">Eliminar</button>
-        </div>
-      `)
-    ]),
-    search: true,
-    pagination: {enabled: true, limit: 10}
-  });
-
-  grid.render(document.getElementById("voluntarios-table"))
+  generateTable([
+    "ID",
+    "Nombre Completo",
+    "Correo",
+    "Nivel de Educacion",
+    "Acciones",
+  ]);
 </script>
 {% endblock %}

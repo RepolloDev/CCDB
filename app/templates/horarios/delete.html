@@ -1,0 +1,13 @@
+<form method="post" action="{{ url_for('horarios.eliminar', id=horario.id_horario) }}" class="p-4">
+  <h2 class="text-xl font-semibold mb-4">Confirmar eliminación</h2>
+  <p class="mb-4">
+    ¿Estás seguro que deseas eliminar el horario
+    <strong>{{ horario.dia }} {{ horario.turno }}</strong>
+    ({{ horario.h_inicio }} - {{ horario.h_fin }})?
+  </p>
+
+  <div class="flex justify-center gap-4">
+    <a href="{{ url_for('horarios.index') }}" class="btn">Cancelar</a>
+    <button type="submit" class="btn btn-error">Eliminar</button>
+  </div>
+</form>

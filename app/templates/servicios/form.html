@@ -1,0 +1,110 @@
+<form id="form" class="p-2 h-full flex flex-col" action="{% if servicio %}{{ url_for('servicios.editar', id=servicio.id_servicio) }}{% else %}{{ url_for('servicios.crear') }}{% endif %}" method="post">
+  <h1 class="text-2xl font-semibold mb-4">
+    {% if servicio %}Editar Servicio{% else %}Crear Servicio{% endif %}
+  </h1>
+
+  {% if servicio %}
+  <input type="hidden" name="id_servicio" value="{{ servicio.id_servicio }}" />
+  {% endif %}
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Información de la Actividad -->
+    <div class="md:col-span-2">
+      <h2 class="text-lg font-semibold mb-2">Información de la Actividad</h2>
+    </div>
+
+    <div>
+      <label class="input w-full">
+        <span class="label">Código de Actividad</span>
+        <input type="text" name="cod_actividad" required value="{{ servicio.cod_actividad if servicio else '' }}" placeholder="SER-2024-A" />
+      </label>
+    </div>
+
+    <div>
+      <label class="input w-full">
+        <span class="label">Nombre del Servicio</span>
+        <input type="text" name="nombre" required value="{{ servicio.nombre if servicio else '' }}" placeholder="Ej: Biblioteca" />
+      </label>
+    </div>
+
+    <div class="md:col-span-2">
+      <label class="form-control w-full">
+        <span class="label">Descripción</span>
+        <textarea name="descripcion" rows="3" class="textarea textarea-bordered w-full" placeholder="Descripción del servicio...">{{ servicio.descripcion if servicio else '' }}</textarea>
+      </label>
+    </div>
+
+    <!-- Relaciones -->
+    <div class="md:col-span-2">
+      <h2 class="text-lg font-semibold mb-2 mt-4">Configuración</h2>
+    </div>
+
+    <div>
+      <label class="select w-full">
+        <span class="label">Periodo</span>
+        <select name="id_periodo">
+          <option value="">Sin periodo asignado</option>
+          {% for p in periodos %}
+          <option value="{{ p.id_periodo }}" {% if servicio and servicio.id_periodo == p.id_periodo %}selected{% endif %}>
+            {{ p.periodo_completo }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <div>
+      <label class="select w-full">
+        <span class="label">Horario</span>
+        <select name="id_horario">
+          <option value="">Sin horario asignado</option>
+          {% for h in horarios %}
+          <option value="{{ h.id_horario }}" {% if servicio and servicio.id_horario == h.id_horario %}selected{% endif %}>
+            {{ h.horario_completo }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <div>
+      <label class="select w-full">
+        <span class="label">Salón</span>
+        <select name="id_salon">
+          <option value="">Sin salón asignado</option>
+          {% for s in salones %}
+          <option value="{{ s.id_salon }}" {% if servicio and servicio.id_salon == s.id_salon %}selected{% endif %}>
+            {{ s.salon_completo }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <!-- Información del Servicio -->
+    <div class="md:col-span-2">
+      <h2 class="text-lg font-semibold mb-2 mt-4">Información del Servicio</h2>
+    </div>
+
+    <div>
+      <label class="input w-full">
+        <span class="label">Tipo de Servicio</span>
+        <input type="text" name="tipo" value="{{ servicio.tipo if servicio else '' }}" placeholder="Ej: Cultural, Deportivo, etc." />
+      </label>
+    </div>
+
+    <div>
+      <label class="select w-full">
+        <span class="label">Estado</span>
+        <select name="estado" required>
+          <option value="activo" {% if servicio and servicio.estado == 'activo' %}selected{% endif %}>Activo</option>
+          <option value="inactivo" {% if servicio and servicio.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <div class="mt-8">
+    <button type="submit" class="btn btn-primary w-full">Guardar</button>
+  </div>
+</form>

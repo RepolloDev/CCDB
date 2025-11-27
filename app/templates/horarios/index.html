@@ -1,7 +1,7 @@
-{% extends "layouts/crudLayout.html" %}
-{% block title %}
+{% extends "layouts/crudLayout.html" %} {% block title %}
 <span>Horarios</span>
 {% endblock %}
+<!-- Contenido -->
 {% block content %}
 
 <!-- ======= ESTADÍSTICAS ======= -->
@@ -18,92 +18,36 @@
   </div>
 </div>
 
-<!-- Botón Registrar -->
-<div class="flex justify-end mb-4">
-  <label for="modalNuevoHorario" class="btn btn-primary">
-    <box-icon name="time-five"></box-icon>
-    Registrar nuevo horario
-  </label>
-</div>
-
-<!-- ======= MODAL ======= -->
-<input type="checkbox" id="modalNuevoHorario" class="modal-toggle" />
-<div class="modal">
-  <div class="modal-box w-11/12 max-w-3xl">
-    <h3 class="font-bold text-lg">Registrar Nuevo Horario</h3>
-
-    <form id="formNuevoHorario">
-      <div class="py-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="label">
-              <span class="label-text">Turno</span>
-            </label>
-            <select name="turno" class="select select-bordered w-full" required>
-              <option value="">Seleccione turno...</option>
-              <option value="Mañana">Mañana</option>
-              <option value="Tarde">Tarde</option>
-              <option value="Noche">Noche</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Día</span>
-            </label>
-            <select name="dia" class="select select-bordered w-full" required>
-              <option value="">Seleccione día...</option>
-              <option value="Lunes">Lunes</option>
-              <option value="Martes">Martes</option>
-              <option value="Miércoles">Miércoles</option>
-              <option value="Jueves">Jueves</option>
-              <option value="Viernes">Viernes</option>
-              <option value="Sábado">Sábado</option>
-              <option value="Domingo">Domingo</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Hora de inicio</span>
-            </label>
-            <input type="time" name="h_inicio" class="input input-bordered w-full" required />
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Hora de fin</span>
-            </label>
-            <input type="time" name="h_fin" class="input input-bordered w-full" required />
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-action">
-        <label for="modalNuevoHorario" class="btn">Cancelar</label>
-        <button type="submit" class="btn btn-primary">
-          Guardar Horario
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <!-- ===== TABLA ===== -->
 <div>
   <h2 class="my-8 text-2xl font-semibold">Vista general</h2>
+  <div class="mb-2">
+    <button
+      class="btn btn-primary btn-lg"
+      data-ref="{{ url_for('horarios.crear') }}"
+    >
+      Agregar
+    </button>
+  </div>
   <div class="overflow-x-auto">
     <div id="table-data"></div>
   </div>
 </div>
 
 {% endblock %}
+<!-- Scripts -->
 {% block scripts %}
 <script id="data" type="application/json">
   {{ data | tojson }}
 </script>
 
 <script>
+  const EDIT_URL_TEMPLATE =
+    "{{ url_for('horarios.editar', id=0).replace('/0','/__ID__') }}";
+  const DELETE_URL_TEMPLATE =
+    "{{ url_for('horarios.eliminar', id=0).replace('/0','/__ID__') }}";
+  const CREATE_URL = "{{ url_for('horarios.crear') }}";
+
   generateTable([
     "ID",
     "Turno",
@@ -112,31 +56,5 @@
     "Hora de fin",
     "Acciones",
   ]);
-
-  // Submit del formulario del modal
-  document
-    .getElementById("formNuevoHorario")
-    .addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const form = new FormData(e.target);
-      const data = Object.fromEntries(form.entries());
-
-      const res = await fetch("/horarios/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const json = await res.json();
-
-      if (!res.ok) {
-        alert(json.error);
-        return;
-      }
-
-      alert("Horario creado correctamente");
-      location.reload();
-    });
 </script>
 {% endblock %}

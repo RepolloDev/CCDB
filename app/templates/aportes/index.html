@@ -1,7 +1,8 @@
 {% extends "layouts/crudLayout.html" %} {% block title %}
 <span>Aportes</span>
-{% endblock %} {% block content %}
-
+{% endblock %}
+<!-- Content -->
+{% block content %}
 <!-- ======= ESTADÍSTICAS ======= -->
 <div>
   <div class="stats border border-base-300 w-full">
@@ -31,20 +32,20 @@
     <div id="table-data"></div>
   </div>
 </div>
-
-{% endblock %} {% block scripts %}
+{% endblock %}
+<!-- Scripts -->
+{% block scripts %}
 <script id="data" type="application/json">
   {{ data | tojson }}
 </script>
 
 <script>
-  // URL templates injected from Flask so client JS can build endpoints for each row.
-  // Use the placeholder __ID__ which will be replaced with the real id.
-  const APORTE_EDIT_URL_TEMPLATE =
+  // Generic names used by generate.js (preferred). Pages should define these; if not present, generator falls back to resource-specific ones.
+  const EDIT_URL_TEMPLATE =
     "{{ url_for('aportes.editar', id=0).replace('/0','/__ID__') }}";
-  const APORTE_DELETE_URL_TEMPLATE =
+  const DELETE_URL_TEMPLATE =
     "{{ url_for('aportes.eliminar', id=0).replace('/0','/__ID__') }}";
-  const APORTE_CREATE_URL = "{{ url_for('aportes.crear') }}";
+  const CREATE_URL = "{{ url_for('aportes.crear') }}";
 
   generateTable([
     "ID",

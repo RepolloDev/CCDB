@@ -1,7 +1,7 @@
-{% extends "layouts/crudLayout.html" %}
-{% block title %}
+{% extends "layouts/crudLayout.html" %} {% block title %}
 <span>Periodos</span>
 {% endblock %}
+<!-- Contenido -->
 {% block content %}
 
 <!-- ======= ESTADÍSTICAS ======= -->
@@ -17,112 +17,42 @@
     </div>
   </div>
 </div>
-
-<!-- Botón Registrar -->
-<div class="flex justify-end mb-4">
-  <label for="modalNuevoPeriodo" class="btn btn-primary">
-    <box-icon name="calendar-plus"></box-icon>
-    Registrar nuevo periodo
-  </label>
-</div>
-
-<!-- ======= MODAL ======= -->
-<input type="checkbox" id="modalNuevoPeriodo" class="modal-toggle" />
-<div class="modal">
-  <div class="modal-box w-11/12 max-w-3xl">
-    <h3 class="font-bold text-lg">Registrar Nuevo Periodo</h3>
-
-    <form id="formNuevoPeriodo">
-      <div class="py-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="label">
-              <span class="label-text">Fecha Inicio</span>
-            </label>
-            <input type="date" name="f_inicio" class="input input-bordered w-full" required />
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Fecha Fin</span>
-            </label>
-            <input type="date" name="f_fin" class="input input-bordered w-full" required />
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Fecha Creación</span>
-            </label>
-            <input type="datetime-local" name="f_creacion" class="input input-bordered w-full" required />
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Fecha Edición</span>
-            </label>
-            <input type="datetime-local" name="f_eicion" class="input input-bordered w-full" />
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-action">
-        <label for="modalNuevoPeriodo" class="btn">Cancelar</label>
-        <button type="submit" class="btn btn-primary">
-          Guardar Periodo
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <!-- ===== TABLA ===== -->
 <div>
   <h2 class="my-8 text-2xl font-semibold">Vista general</h2>
+  <div class="mb-2">
+    <button
+      class="btn btn-primary btn-lg"
+      data-ref="{{ url_for('periodos.crear') }}"
+    >
+      Agregar
+    </button>
+  </div>
   <div class="overflow-x-auto">
     <div id="table-data"></div>
   </div>
 </div>
 
 {% endblock %}
+<!-- Scripts -->
 {% block scripts %}
 <script id="data" type="application/json">
   {{ data | tojson }}
 </script>
-
+<script src="{{ url_for('static', filename='js/generate.js') }}"></script>
+<script src="{{ url_for('static', filename='js/table.js') }}"></script>
+<script src="{{ url_for('static', filename='js/modal.js') }}"></script>
 <script>
+  const EDIT_URL_TEMPLATE = "{{ url_for('periodos.editar', id=0).replace('/0','/__ID__') }}";
+  const DELETE_URL_TEMPLATE = "{{ url_for('periodos.eliminar', id=0).replace('/0','/__ID__') }}";
+  const CREATE_URL = "{{ url_for('periodos.crear') }}";
+
   generateTable([
     "ID",
     "Fecha Inicio",
     "Fecha Fin",
-    "Fecha Creación",
-    "Fecha Edición",
+    "Periodo Completo",
     "Acciones",
   ]);
-
-  // Submit del formulario del modal
-  document
-    .getElementById("formNuevoPeriodo")
-    .addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const form = new FormData(e.target);
-      const data = Object.fromEntries(form.entries());
-
-      const res = await fetch("/periodos/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const json = await res.json();
-
-      if (!res.ok) {
-        alert(json.error);
-        return;
-      }
-
-      alert("Periodo creado correctamente");
-      location.reload();
-    });
 </script>
 {% endblock %}

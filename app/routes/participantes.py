@@ -1,8 +1,6 @@
-from flask import Blueprint, render_template, request, jsonify
-from sqlalchemy import text
-from datetime import date
 from ..db import Database
-from sqlalchemy.exc import IntegrityError
+from ..utils import get_data, respond, query_one, query_all, query_values, execute
+from flask import Blueprint, render_template, url_for, request
 
 db = Database.db
 
@@ -11,180 +9,119 @@ participantes_bp = Blueprint("participantes", __name__, url_prefix="/participant
 
 @participantes_bp.route("/")
 def index():
-    try:
-        query_sql = text("SELECT * FROM participantes_publico")
-        result = db.session.execute(query_sql).mappings()
-        datos = [list(r.values()) for r in result]
-    except Exception as e:
-        print("[ERROR]", e)
-        datos = []
-
-    tutores = db.session.execute(text("SELECT * FROM tutores_select")).mappings().all()
-
-    return render_template("participantes/index.html", data=datos, tutores=tutores)
+    datos = query_values(db, "SELECT * FROM participantes_publico")
+    return render_template("participantes/index.html", data=datos)
 
 
-@participantes_bp.post("/create")
-def crear_participante():
-    data = request.json
+@participantes_bp.route("/crear", methods=["GET", "POST"])
+def crear():
+    if request.method == "GET":
+        tutores = query_all(db, "SELECT * FROM tutores_publico")
+        return render_template("participantes/form.html", tutores=tutores, participante=None)
 
-    # -------- VALIDACIONES BÁSICAS --------
-    required_persona = ["nombre", "paterno", "ci", "fecha_nacimiento"]
-    for field in required_persona:
-        if not data.get(field):
-            return jsonify({"error": f"El campo {field} es obligatorio"}), 400
-
-    # -------- VALIDAR FECHA DE NACIMIENTO --------
-    try:
-        nacimiento = date.fromisoformat(data["fecha_nacimiento"])
-        if nacimiento > date.today():
-            return jsonify({"error": "La fecha de nacimiento no puede ser futura"}), 400
-    except ValueError:
-        return jsonify({"error": "Formato de fecha inválido, usar YYYY-MM-DD"}), 400
-
-    edad = (date.today() - nacimiento).days // 365
-    menor_de_edad = edad < 18
-
-    # -------- VALIDAR TUTOR --------
+    data = get_data()
+    
+    # Normalizar id_tutor (convertir string vacío a None)
     id_tutor = data.get("id_tutor")
-    if menor_de_edad and not id_tutor:
-        return jsonify({"error": "El tutor es obligatorio para menores de edad"}), 400
-
+    if id_tutor == "" or id_tutor is None:
+        id_tutor = None
+    
+    # Buscar o crear persona
     try:
-        # -------- SINCRONIZAR SECUENCIA DE id_persona --------
-        db.session.execute(
-            text(
-                "SELECT setval('persona_id_persona_seq', (SELECT COALESCE(MAX(id_persona),0) FROM persona))"
-            )
-        )
-        print("[INFO] Secuencia de id_persona sincronizada con el máximo valor actual.")
+        persona = query_one(db, "SELECT id_persona FROM persona WHERE ci = :ci", {"ci": data.get("ci")})
+        execute(db, "UPDATE persona SET nombre = :nombre, paterno = :paterno, materno = :materno, celular = :celular, genero = :genero, f_nacimiento = :fn, zona = :zona, calle = :calle, nro = :nro, f_edicion = now() WHERE id_persona = :idp", {
+            "nombre": data.get("nombre"),
+            "paterno": data.get("paterno"),
+            "materno": data.get("materno", ""),
+            "celular": data.get("celular", ""),
+            "genero": data.get("genero", ""),
+            "fn": data.get("fecha_nacimiento"),
+            "zona": data.get("zona", ""),
+            "calle": data.get("barrio", ""),
+            "nro": data.get("nro_casa", ""),
+            "idp": persona["id_persona"],
+        })
+        id_persona = persona["id_persona"]
+    except:
+        id_persona = execute(db, "INSERT INTO persona (nombre, paterno, materno, ci, celular, genero, f_nacimiento, zona, calle, nro) VALUES (:nombre, :paterno, :materno, :ci, :celular, :genero, :fn, :zona, :calle, :nro) RETURNING id_persona", {
+            "nombre": data.get("nombre"),
+            "paterno": data.get("paterno"),
+            "materno": data.get("materno", ""),
+            "ci": data.get("ci"),
+            "celular": data.get("celular", ""),
+            "genero": data.get("genero", ""),
+            "fn": data.get("fecha_nacimiento"),
+            "zona": data.get("zona", ""),
+            "calle": data.get("barrio", ""),
+            "nro": data.get("nro_casa", ""),
+        })
 
-        # -------- BUSCAR PERSONA POR CI --------
-        persona_existente = db.session.execute(
-            text("SELECT id_persona FROM persona WHERE ci = :ci"), {"ci": data["ci"]}
-        ).first()
+    # Verificar si ya existe participante
+    try:
+        existing = query_one(db, "SELECT id_participante FROM participante WHERE id_persona = :idp", {"idp": id_persona})
+        # Si existe, actualizar en vez de crear
+        execute(db, "UPDATE participante SET estado = :estado, id_tutor = :idt WHERE id_participante = :id", {
+            "estado": data.get("estado", "activo"),
+            "idt": id_tutor,
+            "id": existing["id_participante"],
+        })
+    except:
+        # Crear participante
+        execute(db, "INSERT INTO participante (id_persona, estado, id_tutor) VALUES (:idp, :estado, :idt)", {
+            "idp": id_persona,
+            "estado": data.get("estado", "activo"),
+            "idt": id_tutor,
+        })
+    
+    return respond("Participante creado", redirect_to=url_for("participantes.index"), status=201)
 
-        if persona_existente:
-            id_persona = persona_existente[0]
-            print(
-                f"[INFO] Persona existente encontrada: id_persona={id_persona}, CI={data['ci']}"
-            )
-            db.session.execute(
-                text("""
-                    UPDATE persona SET
-                        nombre = :nombre,
-                        paterno = :paterno,
-                        materno = :materno,
-                        celular = :celular,
-                        genero = :genero,
-                        f_nacimiento = :fn,
-                        zona = :zona,
-                        calle = :calle,
-                        nro = :nro,
-                        f_edicion = now()
-                    WHERE id_persona = :idp
-                """),
-                {
-                    "nombre": data["nombre"],
-                    "paterno": data["paterno"],
-                    "materno": data.get("materno", ""),
-                    "celular": data.get("celular", ""),
-                    "genero": data.get("genero", ""),
-                    "fn": data["fecha_nacimiento"],
-                    "zona": data.get("zona", ""),
-                    "calle": data.get("calle", ""),
-                    "nro": data.get("nro_casa", ""),
-                    "idp": id_persona,
-                },
-            )
-            print(
-                f"[INFO] Persona actualizada en la tabla persona: id_persona={id_persona}"
-            )
-        else:
-            # -------- INSERTAR NUEVA PERSONA --------
-            persona_sql = text("""
-                INSERT INTO persona (nombre, paterno, materno, ci, celular, genero, f_nacimiento, zona, calle, nro)
-                VALUES (:nombre, :paterno, :materno, :ci, :celular, :genero, :fn, :zona, :calle, :nro)
-                RETURNING id_persona
-            """)
-            res = db.session.execute(
-                persona_sql,
-                {
-                    "nombre": data["nombre"],
-                    "paterno": data["paterno"],
-                    "materno": data.get("materno", ""),
-                    "ci": data["ci"],
-                    "celular": data.get("celular", ""),
-                    "genero": data.get("genero", ""),
-                    "fn": data["fecha_nacimiento"],
-                    "zona": data.get("zona", ""),
-                    "calle": data.get("barrio", ""),
-                    "nro": data.get("nro_casa", ""),
-                },
-            )
-            id_persona = res.scalar()
-            print(
-                f"[INFO] Nueva persona insertada: id_persona={id_persona}, CI={data['ci']}"
-            )
 
-        # -------- SINCRONIZAR SECUENCIA DE id_participante --------
-        db.session.execute(
-            text(
-                "SELECT setval('participante_id_participante_seq', (SELECT COALESCE(MAX(id_participante),0) FROM participante))"
-            )
-        )
-        print(
-            "[INFO] Secuencia de id_participante sincronizada con el máximo valor actual."
-        )
+@participantes_bp.route("/editar/<int:id>", methods=["GET", "POST"])
+def editar(id):
+    if request.method == "GET":
+        participante = query_one(db, "SELECT p.id_participante, p.id_persona, pe.ci, pe.nombre, pe.paterno, pe.materno, pe.celular, pe.genero, pe.f_nacimiento, pe.zona, pe.calle, pe.nro, p.estado, p.id_tutor FROM participante p JOIN persona pe ON pe.id_persona = p.id_persona WHERE p.id_participante = :id", {"id": id})
+        tutores = query_all(db, "SELECT * FROM tutores_publico")
+        return render_template("participantes/form.html", tutores=tutores, participante=participante)
 
-        # -------- VERIFICAR PARTICIPANTE EXISTENTE --------
-        participante_existente = db.session.execute(
-            text(
-                "SELECT id_participante, matricula FROM participante WHERE id_persona = :idp"
-            ),
-            {"idp": id_persona},
-        ).first()
+    data = get_data()
+    
+    # Normalizar id_tutor (convertir string vacío a None)
+    id_tutor = data.get("id_tutor")
+    if id_tutor == "" or id_tutor is None:
+        id_tutor = None
+    
+    # Obtener id_persona del participante
+    result = query_one(db, "SELECT id_persona FROM participante WHERE id_participante = :id", {"id": id})
+    
+    # Actualizar persona
+    execute(db, "UPDATE persona SET nombre = :nombre, paterno = :paterno, materno = :materno, celular = :celular, genero = :genero, f_nacimiento = :fn, zona = :zona, calle = :calle, nro = :nro, f_edicion = now() WHERE id_persona = :idp", {
+        "nombre": data.get("nombre"),
+        "paterno": data.get("paterno"),
+        "materno": data.get("materno", ""),
+        "celular": data.get("celular", ""),
+        "genero": data.get("genero", ""),
+        "fn": data.get("fecha_nacimiento"),
+        "zona": data.get("zona", ""),
+        "calle": data.get("barrio", ""),
+        "nro": data.get("nro_casa", ""),
+        "idp": result["id_persona"],
+    })
+    
+    # Actualizar participante
+    execute(db, "UPDATE participante SET estado = :estado, id_tutor = :idt WHERE id_participante = :id", {
+        "estado": data.get("estado", "activo"),
+        "idt": id_tutor,
+        "id": id,
+    })
+    
+    return respond("Participante actualizado", redirect_to=url_for("participantes.index"))
 
-        if participante_existente:
-            matricula_generada = participante_existente[1]
-            print(
-                f"[INFO] Participante ya existe: id_participante={participante_existente[0]}, matricula={matricula_generada}"
-            )
-        else:
-            # -------- INSERTAR PARTICIPANTE --------
-            participante_sql = text("""
-                INSERT INTO participante (id_persona, estado, id_tutor)
-                VALUES (:idp, :estado, :idt)
-                RETURNING matricula
-            """)
-            res_part = db.session.execute(
-                participante_sql,
-                {
-                    "idp": id_persona,
-                    "estado": data.get("estado", "activo"),
-                    "idt": id_tutor,
-                },
-            )
-            matricula_generada = res_part.scalar()
-            print(
-                f"[INFO] Nuevo participante insertado: id_persona={id_persona}, matricula={matricula_generada}"
-            )
 
-        db.session.commit()
+@participantes_bp.route("/eliminar/<int:id>", methods=["GET", "POST"])
+def eliminar(id):
+    if request.method == "GET":
+        participante = query_one(db, "SELECT * FROM participantes_publico WHERE id_participante = :id", {"id": id})
+        return render_template("participantes/delete.html", participante=participante)
 
-        return jsonify(
-            {
-                "ok": True,
-                "message": "Participante registrado con éxito",
-                "matricula": matricula_generada,
-            }
-        )
-
-    except IntegrityError as ie:
-        db.session.rollback()
-        print(f"[ERROR] IntegrityError: {ie}")
-        return jsonify({"error": "Datos duplicados o inválidos"}), 409
-    except Exception as e:
-        db.session.rollback()
-        print(f"[ERROR] Exception: {e}")
-        return jsonify({"error": str(e)}), 500
+    execute(db, "DELETE FROM participante WHERE id_participante = :id", {"id": id})
+    return respond("Participante eliminado", redirect_to=url_for("participantes.index"))

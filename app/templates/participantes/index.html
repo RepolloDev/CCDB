@@ -1,6 +1,8 @@
 {% extends "layouts/crudLayout.html" %} {% block title %}
 <span>Participantes</span>
-{% endblock %} {% block content %}
+{% endblock %}
+<!-- Contenido -->
+{% block content %}
 
 <!-- ======= ESTADÍSTICAS ======= -->
 <div>
@@ -34,240 +36,44 @@
   </div>
 </div>
 
-<!-- Botón Registrar -->
-<div class="flex justify-end mb-4">
-  <label for="modalNuevoParticipante" class="btn btn-primary">
-    <box-icon name="user-plus"></box-icon>
-    Registrar nuevo participante
-  </label>
-</div>
-
-<!-- ======= MODAL ======= -->
-<input type="checkbox" id="modalNuevoParticipante" class="modal-toggle" />
-<div class="modal">
-  <div class="modal-box w-11/12 max-w-5xl">
-    <h3 class="font-bold text-lg">Registrar Nuevo Participante</h3>
-
-    <form id="formNuevoParticipante">
-      <div class="py-4">
-        <h6 class="font-bold">Datos de la Persona</h6>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label class="label">
-              <span class="label-text">CI</span>
-            </label>
-            <input
-              type="text"
-              name="ci"
-              class="input input-bordered w-full"
-              required
-            />
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Nombre</span>
-            </label>
-            <input
-              type="text"
-              name="nombre"
-              class="input input-bordered w-full"
-              required
-            />
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Paterno</span>
-            </label>
-            <input
-              type="text"
-              name="paterno"
-              class="input input-bordered w-full"
-              required
-            />
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Materno</span>
-            </label>
-            <input
-              type="text"
-              name="materno"
-              class="input input-bordered w-full"
-            />
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Celular</span>
-            </label>
-            <input
-              type="text"
-              name="celular"
-              class="input input-bordered w-full"
-            />
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Género</span>
-            </label>
-            <select
-              name="genero"
-              class="select select-bordered w-full"
-              required
-            >
-              <option value="">Seleccione</option>
-              <option value="M">Masculino</option>
-              <option value="F">Femenino</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Fecha Nacimiento</span>
-            </label>
-            <input
-              type="date"
-              name="fecha_nacimiento"
-              class="input input-bordered w-full"
-              required
-            />
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Zona</span>
-            </label>
-            <input
-              type="text"
-              name="zona"
-              class="input input-bordered w-full"
-            />
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Barrio/Calle</span>
-            </label>
-            <input
-              type="text"
-              name="barrio"
-              class="input input-bordered w-full"
-            />
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Nro. Casa</span>
-            </label>
-            <input
-              type="text"
-              name="nro_casa"
-              class="input input-bordered w-full"
-            />
-          </div>
-        </div>
-
-        <hr class="my-4" />
-
-        <h6 class="font-bold">Datos del Participante</h6>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="label">
-              <span class="label-text">Estado</span>
-            </label>
-            <select
-              name="estado"
-              class="select select-bordered w-full"
-              required
-            >
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Tutor</span>
-            </label>
-            <select
-              name="id_tutor"
-              class="select select-bordered w-full"
-              required
-            >
-              <option value="">Seleccione tutor...</option>
-              {% for t in tutores %}
-              <option value="{{ t.id_tutor }}">
-                {{ t.nombre_completo }} ({{ t.parentesco }})
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-action">
-        <label for="modalNuevoParticipante" class="btn">Cancelar</label>
-        <button type="submit" class="btn btn-primary">
-          Guardar Participante
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <!-- ===== TABLA ===== -->
 <div>
   <h2 class="my-8 text-2xl font-semibold">Vista general</h2>
+  <div>
+    <button
+      class="btn btn-primary btn-lg"
+      data-ref="{{ url_for('participantes.crear') }}"
+    >
+      Agregar
+    </button>
+  </div>
   <div class="overflow-x-auto">
     <div id="table-data"></div>
   </div>
 </div>
 
-{% endblock %} {% block scripts %}
+{% endblock %}
+<!-- Scripts -->
+{% block scripts %}
 <script id="data" type="application/json">
   {{ data | tojson }}
 </script>
-
+<script src="{{ url_for('static', filename='js/generate.js') }}"></script>
+<script src="{{ url_for('static', filename='js/table.js') }}"></script>
+<script src="{{ url_for('static', filename='js/modal.js') }}"></script>
 <script>
+  const EDIT_URL_TEMPLATE = "{{ url_for('participantes.editar', id=0).replace('/0','/__ID__') }}";
+  const DELETE_URL_TEMPLATE = "{{ url_for('participantes.eliminar', id=0).replace('/0','/__ID__') }}";
+  const CREATE_URL = "{{ url_for('participantes.crear') }}";
+
   generateTable([
     "ID",
-    "Nombre",
-    "Carnet",
-    "Matricula",
+    "Nombre Completo",
+    "CI",
+    "Matrícula",
     "Estado",
     "Tutor",
     "Acciones",
   ]);
-
-  // Submit del formulario del modal
-  document
-    .getElementById("formNuevoParticipante")
-    .addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const form = new FormData(e.target);
-      const data = Object.fromEntries(form.entries());
-
-      const res = await fetch("/participantes/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const json = await res.json();
-
-      if (!res.ok) {
-        alert(json.error);
-        return;
-      }
-
-      alert("Participante creado correctamente");
-      location.reload();
-    });
 </script>
-
 {% endblock %}

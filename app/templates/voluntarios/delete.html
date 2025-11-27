@@ -1,0 +1,9 @@
+<form method="post" action="{{ url_for('voluntarios.eliminar', id=voluntario.id_voluntario) }}" class="p-4">
+	<h2 class="text-xl font-semibold mb-4">Confirmar eliminación</h2>
+	<p class="mb-4">¿Estás seguro que deseas eliminar al voluntario <strong>{{ voluntario.nombre_completo or '' }}</strong> (correo: <strong>{{ voluntario.correo or '' }}</strong>)?</p>
+
+	<div class="flex justify-center gap-4">
+		<a href="{{ url_for('voluntarios.index') }}" class="btn">Cancelar</a>
+		<button type="submit" class="btn btn-error">Eliminar</button>
+	</div>
+</form>

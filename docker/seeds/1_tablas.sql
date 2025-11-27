@@ -136,25 +136,25 @@ create table servicio (
 );
 
 create table voluntario_participa_servicio (
-   id_servicio   bigint not null,
-   id_voluntario bigint not null,
-   constraint pk_vol_part_serv primary key ( id_servicio,
-                                             id_voluntario ),
+   id_vps         bigserial primary key,
+   id_servicio    bigint not null,
+   id_voluntario  bigint not null,
+   constraint uq_vps_serv_vol unique ( id_servicio, id_voluntario ),
    constraint fk_vps_servicio foreign key ( id_servicio )
-         references servicio ( id_servicio ) ON DELETE CASCADE,
-      constraint fk_vps_voluntario foreign key ( id_voluntario )
-         references voluntario ( id_voluntario ) ON DELETE CASCADE
+      references servicio ( id_servicio ) ON DELETE CASCADE,
+   constraint fk_vps_voluntario foreign key ( id_voluntario )
+      references voluntario ( id_voluntario ) ON DELETE CASCADE
 );
 
 create table participante_seregistra_curso_taller (
-   id_curtal       bigint not null,
-   id_participante bigint not null,
-   constraint pk_part_reg_ct primary key ( id_curtal,
-                                           id_participante ),
+   id_psct          bigserial primary key,
+   id_curtal        bigint not null,
+   id_participante  bigint not null,
+   constraint uq_psct_curtal_part unique ( id_curtal, id_participante ),
    constraint fk_psct_curtal foreign key ( id_curtal )
-         references curso_taller ( id_curtal ) ON DELETE CASCADE,
-      constraint fk_psct_participante foreign key ( id_participante )
-         references participante ( id_participante ) ON DELETE CASCADE
+      references curso_taller ( id_curtal ) ON DELETE CASCADE,
+   constraint fk_psct_participante foreign key ( id_participante )
+      references participante ( id_participante ) ON DELETE CASCADE
 );
 
 create table aporte (

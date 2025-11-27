@@ -1,7 +1,7 @@
-{% extends "layouts/crudLayout.html" %}
-{% block title %}
+{% extends "layouts/crudLayout.html" %} {% block title %}
 <span>Asignaciones</span>
 {% endblock %}
+<!-- Contenido -->
 {% block content %}
 
 <!-- ======= ESTADÍSTICAS ======= -->
@@ -18,122 +18,43 @@
   </div>
 </div>
 
-<!-- Botón Registrar -->
-<div class="flex justify-end mb-4">
-  <label for="modalNuevaAsignacion" class="btn btn-primary">
-    <box-icon name="task"></box-icon>
-    Registrar nueva asignación
-  </label>
-</div>
-
-<!-- ======= MODAL ======= -->
-<input type="checkbox" id="modalNuevaAsignacion" class="modal-toggle" />
-<div class="modal">
-  <div class="modal-box w-11/12 max-w-3xl">
-    <h3 class="font-bold text-lg">Registrar Nueva Asignación</h3>
-
-    <form id="formNuevaAsignacion">
-      <div class="py-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="label">
-              <span class="label-text">Actividad</span>
-            </label>
-            <select name="id_actividad" class="select select-bordered w-full" required>
-              <option value="">Seleccione actividad...</option>
-              {% for a in actividades %}
-              <option value="{{ a.id_actividad }}">
-                {{ a.cod_actividad }} - {{ a.nombre }}
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Voluntario</span>
-            </label>
-            <select name="id_voluntario" class="select select-bordered w-full" required>
-              <option value="">Seleccione voluntario...</option>
-              {% for v in voluntarios %}
-              <option value="{{ v.id_voluntario }}">
-                {{ v.nombre_completo }}
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <div class="md:col-span-2">
-            <label class="label">
-              <span class="label-text">Tipo</span>
-            </label>
-            <select name="tipo" class="select select-bordered w-full" required>
-              <option value="">Seleccione tipo...</option>
-              <option value="educacion">Educación</option>
-              <option value="servicio">Servicio</option>
-              <!-- puedes agregar más tipos según tu modelo -->
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-action">
-        <label for="modalNuevaAsignacion" class="btn">Cancelar</label>
-        <button type="submit" class="btn btn-primary">
-          Guardar Asignación
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- ===== TABLA ===== -->
 <div>
   <h2 class="my-8 text-2xl font-semibold">Vista general</h2>
+  <div class="mb-2">
+    <button
+      class="btn btn-primary btn-lg"
+      data-ref="{{ url_for('asignaciones.crear') }}"
+    >
+      Agregar
+    </button>
+  </div>
   <div class="overflow-x-auto">
     <div id="table-data"></div>
   </div>
 </div>
-
 {% endblock %}
+<!-- Scripts -->
 {% block scripts %}
 <script id="data" type="application/json">
   {{ data | tojson }}
 </script>
 
 <script>
+  const EDIT_URL_TEMPLATE =
+    "{{ url_for('asignaciones.editar', id=0).replace('/0','/__ID__') }}";
+  const DELETE_URL_TEMPLATE =
+    "{{ url_for('asignaciones.eliminar', id=0).replace('/0','/__ID__') }}";
+  const CREATE_URL = "{{ url_for('asignaciones.crear') }}";
+
   generateTable([
+    "ID",
+    "ID Servicio",
+    "ID Voluntario",
     "Código Actividad",
     "Nombre Actividad",
     "Voluntario Asignado",
     "Tipo",
     "Acciones",
   ]);
-
-  // Submit del formulario del modal
-  document
-    .getElementById("formNuevaAsignacion")
-    .addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const form = new FormData(e.target);
-      const data = Object.fromEntries(form.entries());
-
-      const res = await fetch("/asignaciones/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const json = await res.json();
-
-      if (!res.ok) {
-        alert(json.error);
-        return;
-      }
-
-      alert("Asignación creada correctamente");
-      location.reload();
-    });
 </script>
 {% endblock %}

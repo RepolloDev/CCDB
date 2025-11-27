@@ -1,0 +1,85 @@
+<form id="form" class="p-2 h-full flex flex-col" action="{% if participante %}{{ url_for('participantes.editar', id=participante.id_participante) }}{% else %}{{ url_for('participantes.crear') }}{% endif %}" method="post">
+  <h1 class="text-2xl font-semibold mb-4">{% if participante %}Editar Participante{% else %}Crear Participante{% endif %}</h1>
+
+  {% if participante %}
+  <input type="hidden" name="id_participante" value="{{ participante.id_participante }}" />
+  {% endif %}
+
+  <div class="grid grid-cols-1 gap-4">
+    <div>
+      <label class="label"><span class="label-text">CI</span></label>
+      <input type="text" name="ci" class="input input-bordered w-full" value="{% if participante %}{{ participante.ci }}{% endif %}" required />
+    </div>
+
+    <div>
+      <label class="label"><span class="label-text">Nombre</span></label>
+      <input type="text" name="nombre" class="input input-bordered w-full" value="{% if participante %}{{ participante.nombre }}{% endif %}" required />
+    </div>
+
+    <div>
+      <label class="label"><span class="label-text">Paterno</span></label>
+      <input type="text" name="paterno" class="input input-bordered w-full" value="{% if participante %}{{ participante.paterno }}{% endif %}" required />
+    </div>
+
+    <div>
+      <label class="label"><span class="label-text">Materno</span></label>
+      <input type="text" name="materno" class="input input-bordered w-full" value="{% if participante %}{{ participante.materno }}{% endif %}" />
+    </div>
+
+    <div>
+      <label class="label"><span class="label-text">Celular</span></label>
+      <input type="text" name="celular" class="input input-bordered w-full" value="{% if participante %}{{ participante.celular }}{% endif %}" />
+    </div>
+
+    <div>
+      <label class="label"><span class="label-text">Género</span></label>
+      <select name="genero" class="select select-bordered w-full" required>
+        <option value="">Seleccione</option>
+        <option value="M" {% if participante and participante.genero == 'M' %}selected{% endif %}>Masculino</option>
+        <option value="F" {% if participante and participante.genero == 'F' %}selected{% endif %}>Femenino</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="label"><span class="label-text">Fecha Nacimiento</span></label>
+      <input type="date" name="fecha_nacimiento" class="input input-bordered w-full" value="{% if participante and participante.f_nacimiento %}{{ participante.f_nacimiento }}{% endif %}" required />
+    </div>
+
+    <div>
+      <label class="label"><span class="label-text">Zona</span></label>
+      <input type="text" name="zona" class="input input-bordered w-full" value="{% if participante %}{{ participante.zona }}{% endif %}" />
+    </div>
+
+    <div>
+      <label class="label"><span class="label-text">Barrio / Calle</span></label>
+      <input type="text" name="barrio" class="input input-bordered w-full" value="{% if participante %}{{ participante.calle }}{% endif %}" />
+    </div>
+
+    <div>
+      <label class="label"><span class="label-text">Nro Casa</span></label>
+      <input type="text" name="nro_casa" class="input input-bordered w-full" value="{% if participante %}{{ participante.nro }}{% endif %}" />
+    </div>
+
+    <div>
+      <label class="label"><span class="label-text">Estado</span></label>
+      <select name="estado" class="select select-bordered w-full" required>
+        <option value="activo" {% if participante and participante.estado == 'activo' %}selected{% endif %}>Activo</option>
+        <option value="inactivo" {% if participante and participante.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="label"><span class="label-text">Tutor</span></label>
+      <select name="id_tutor" class="select select-bordered w-full">
+        <option value="">Seleccione tutor...</option>
+        {% for t in tutores %}
+        <option value="{{ t.id_tutor }}" {% if participante and participante.id_tutor == t.id_tutor %}selected{% endif %}>{{ t.nombre_completo }} ({{ t.parentesco }})</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div class="mt-8">
+    <button type="submit" class="btn btn-primary w-full">Guardar</button>
+  </div>
+</form>

@@ -1,14 +1,107 @@
-<form>
-  <label>
-    Id del curso/Taller
-    <input id="id" type="text" />
-  </label>
-  <label>
-    Nombre del curso
-    <input id="nombre" type="text" />
-  </label>
-  <label>
-    enlace
-    <input id="url" type="text" />
-  </label>
+<form id="form" class="p-2 h-full flex flex-col" action="{% if curso %}{{ url_for('cursos_talleres.editar', id=curso.id_curtal) }}{% else %}{{ url_for('cursos_talleres.crear') }}{% endif %}" method="post">
+  <h1 class="text-2xl font-semibold mb-4">{% if curso %}Editar Curso/Taller{% else %}Crear Curso/Taller{% endif %}</h1>
+
+  {% if curso %}
+  <input type="hidden" name="id_curtal" value="{{ curso.id_curtal }}" />
+  {% endif %}
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Información de la Actividad -->
+    <div class="md:col-span-2">
+      <h2 class="text-lg font-semibold mb-2">Información de la Actividad</h2>
+    </div>
+
+    <div>
+      <label class="input w-full">
+        <span class="label">Código de Actividad</span>
+        <input type="text" name="cod_actividad" required value="{{ curso.cod_actividad if curso else '' }}" placeholder="CUR-2024-A" />
+      </label>
+    </div>
+
+    <div>
+      <label class="input w-full">
+        <span class="label">Nombre del Curso/Taller</span>
+        <input type="text" name="nombre" required value="{{ curso.nombre_actividad if curso else '' }}" placeholder="Ej: Computación Básica" />
+      </label>
+    </div>
+
+    <div class="md:col-span-2">
+      <label class="form-control w-full">
+        <span class="label">Descripción</span>
+        <textarea name="descripcion" rows="3" class="textarea textarea-bordered w-full" placeholder="Descripción del curso o taller...">{{ curso.descripcion if curso else '' }}</textarea>
+      </label>
+    </div>
+
+    <!-- Relaciones -->
+    <div class="md:col-span-2">
+      <h2 class="text-lg font-semibold mb-2 mt-4">Configuración</h2>
+    </div>
+
+    <div>
+      <label class="select w-full">
+        <span class="label">Periodo</span>
+        <select name="id_periodo">
+          <option value="">Sin periodo asignado</option>
+          {% for p in periodos %}
+          <option value="{{ p.id_periodo }}" {% if curso and curso.id_periodo == p.id_periodo %}selected{% endif %}>
+            {{ p.periodo_completo }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <div>
+      <label class="select w-full">
+        <span class="label">Horario</span>
+        <select name="id_horario">
+          <option value="">Sin horario asignado</option>
+          {% for h in horarios %}
+          <option value="{{ h.id_horario }}" {% if curso and curso.id_horario == h.id_horario %}selected{% endif %}>
+            {{ h.horario_completo }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <div>
+      <label class="select w-full">
+        <span class="label">Salón</span>
+        <select name="id_salon">
+          <option value="">Sin salón asignado</option>
+          {% for s in salones %}
+          <option value="{{ s.id_salon }}" {% if curso and curso.id_salon == s.id_salon %}selected{% endif %}>
+            {{ s.salon_completo }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <div>
+      <label class="select w-full">
+        <span class="label">Voluntario Responsable</span>
+        <select name="id_voluntario">
+          <option value="">Sin voluntario asignado</option>
+          {% for v in voluntarios %}
+          <option value="{{ v.id_voluntario }}" {% if curso and curso.id_voluntario == v.id_voluntario %}selected{% endif %}>
+            {{ v.nombre_completo }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <div class="md:col-span-2">
+      <label class="input w-full">
+        <span class="label">Enlace (WhatsApp, Zoom, etc.)</span>
+        <input type="url" name="enlace" value="{{ curso.enlace if curso else '' }}" placeholder="https://..." />
+      </label>
+    </div>
+  </div>
+
+  <div class="mt-8">
+    <button type="submit" class="btn btn-primary w-full">Guardar</button>
+  </div>
 </form>

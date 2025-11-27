@@ -1,7 +1,7 @@
-{% extends "layouts/crudLayout.html" %}
-{% block title %}
+{% extends "layouts/crudLayout.html" %} {% block title %}
 <span>Inscripciones</span>
 {% endblock %}
+<!-- Contenido -->
 {% block content %}
 
 <!-- ======= ESTADÍSTICAS ======= -->
@@ -18,106 +18,43 @@
   </div>
 </div>
 
-<!-- Botón Registrar -->
-<div class="flex justify-end mb-4">
-  <label for="modalNuevaInscripcion" class="btn btn-primary">
-    <box-icon name="user-check"></box-icon>
-    Registrar nueva inscripción
-  </label>
-</div>
-
-<!-- ======= MODAL ======= -->
-<input type="checkbox" id="modalNuevaInscripcion" class="modal-toggle" />
-<div class="modal">
-  <div class="modal-box w-11/12 max-w-3xl">
-    <h3 class="font-bold text-lg">Registrar Nueva Inscripción</h3>
-
-    <form id="formNuevaInscripcion">
-      <div class="py-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="label">
-              <span class="label-text">Actividad</span>
-            </label>
-            <select name="id_curtal" class="select select-bordered w-full" required>
-              <option value="">Seleccione actividad...</option>
-              {% for a in actividades %}
-              <option value="{{ a.id_curtal }}">{{ a.cod_actividad }} - {{ a.nombre }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <div>
-            <label class="label">
-              <span class="label-text">Participante</span>
-            </label>
-            <select name="id_participante" class="select select-bordered w-full" required>
-              <option value="">Seleccione participante...</option>
-              {% for p in participantes %}
-              <option value="{{ p.id_participante }}">{{ p.nombre_completo }} ({{ p.matricula }})</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-action">
-        <label for="modalNuevaInscripcion" class="btn">Cancelar</label>
-        <button type="submit" class="btn btn-primary">
-          Guardar Inscripción
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <!-- ===== TABLA ===== -->
 <div>
   <h2 class="my-8 text-2xl font-semibold">Vista general</h2>
+  <div class="mb-2">
+    <button
+      class="btn btn-primary btn-lg"
+      data-ref="{{ url_for('inscripciones.crear') }}"
+    >
+      Agregar
+    </button>
+  </div>
   <div class="overflow-x-auto">
     <div id="table-data"></div>
   </div>
 </div>
 
 {% endblock %}
+<!-- Scripts -->
 {% block scripts %}
 <script id="data" type="application/json">
   {{ data | tojson }}
 </script>
 
 <script>
+  const EDIT_URL_TEMPLATE =
+    "{{ url_for('inscripciones.editar', id=0).replace('/0','/__ID__') }}";
+  const DELETE_URL_TEMPLATE =
+    "{{ url_for('inscripciones.eliminar', id=0).replace('/0','/__ID__') }}";
+  const CREATE_URL = "{{ url_for('inscripciones.crear') }}";
+
   generateTable([
-    "Código Actividad",
-    "Nombre Actividad",
+    "ID",
+    "Código",
+    "Curso/Taller",
     "Matrícula",
     "Participante",
     "Acciones",
   ]);
-
-  // Submit del formulario del modal
-  document
-    .getElementById("formNuevaInscripcion")
-    .addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const form = new FormData(e.target);
-      const data = Object.fromEntries(form.entries());
-
-      const res = await fetch("/inscripciones/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const json = await res.json();
-
-      if (!res.ok) {
-        alert(json.error);
-        return;
-      }
-
-      alert("Inscripción creada correctamente");
-      location.reload();
-    });
 </script>
 {% endblock %}

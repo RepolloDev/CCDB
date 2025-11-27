@@ -1,0 +1,29 @@
+<form id="form" class="p-2 h-full flex flex-col" action="{% if periodo %}{{ url_for('periodos.editar', id=periodo.id_periodo) }}{% else %}{{ url_for('periodos.crear') }}{% endif %}" method="post">
+  <h1 class="text-2xl font-semibold mb-4">
+    {% if periodo %}Editar Periodo{% else %}Crear Periodo{% endif %}
+  </h1>
+
+  {% if periodo %}
+  <input type="hidden" name="id_periodo" value="{{ periodo.id_periodo }}" />
+  {% endif %}
+
+  <div class="grid grid-cols-1 gap-4">
+    <div>
+      <label class="form-control w-full">
+        <span class="label-text mb-2">Fecha Inicio</span>
+        <input type="datetime-local" name="f_inicio" class="input input-bordered w-full" required value="{% if periodo %}{{ periodo.f_inicio.strftime('%Y-%m-%dT%H:%M') if periodo.f_inicio else '' }}{% endif %}" />
+      </label>
+    </div>
+
+    <div>
+      <label class="form-control w-full">
+        <span class="label-text mb-2">Fecha Fin</span>
+        <input type="datetime-local" name="f_fin" class="input input-bordered w-full" required value="{% if periodo %}{{ periodo.f_fin.strftime('%Y-%m-%dT%H:%M') if periodo.f_fin else '' }}{% endif %}" />
+      </label>
+    </div>
+  </div>
+
+  <div class="mt-8">
+    <button type="submit" class="btn btn-primary w-full">Guardar</button>
+  </div>
+</form>

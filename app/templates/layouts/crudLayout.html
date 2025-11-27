@@ -17,7 +17,7 @@
 <!-- Modal -->
 {% block modal %}
 <dialog id="modal" class="modal">
-  <div class="modal-box overflow-visible">
+  <div class="modal-box min-w-[800px] overflow-visible">
     <form method="dialog">
       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
         <box-icon name="window-close"></box-icon>
@@ -26,8 +26,13 @@
     <div id="modal-content">
       <h3>Formulario</h3>
       <!-- Inline container where fetched form HTML will be injected. -->
-      <div id="modal-content-area" class="w-full overflow-auto max-h-[60vh] p-2 bg-base-100 rounded">
-        <div id="modal-loader" class="py-8 text-center text-sm opacity-60">Cargando formulario...</div>
+      <div
+        id="modal-content-area"
+        class="w-full overflow-auto max-h-[60vh] p-2 bg-base-100 rounded"
+      >
+        <div id="modal-loader" class="py-8 text-center text-sm opacity-60">
+          Cargando formulario...
+        </div>
       </div>
     </div>
   </div>

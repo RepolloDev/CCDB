@@ -1,0 +1,60 @@
+<form id="form" class="p-2 h-full flex flex-col" action="{% if voluntario %}{{ url_for('voluntarios.editar', id=voluntario.id_voluntario) }}{% else %}{{ url_for('voluntarios.crear') }}{% endif %}" method="post">
+  <h1 class="text-2xl font-semibold mb-4">{% if voluntario %}Editar Voluntario{% else %}Crear Voluntario{% endif %}</h1>
+  {% if voluntario %}
+  <input type="hidden" name="id_voluntario" value="{{ voluntario.id_voluntario }}" />
+  {% endif %}
+
+  <div class="grid grid-cols-1 gap-4">
+    <div>
+      <label class="flex flex-col w-full">
+        <span class="label">CI</span>
+        <input name="ci" required value="{{ voluntario.ci if voluntario else '' }}" class="input w-full" />
+      </label>
+    </div>
+
+    <div class="grid grid-cols-3 gap-2">
+      <label class="flex flex-col">
+        <span class="label">Nombre</span>
+        <input name="nombre" required value="{{ voluntario.nombre if voluntario else '' }}" class="input" />
+      </label>
+      <label class="flex flex-col">
+        <span class="label">Paterno</span>
+        <input name="paterno" required value="{{ voluntario.paterno if voluntario else '' }}" class="input" />
+      </label>
+      <label class="flex flex-col">
+        <span class="label">Materno</span>
+        <input name="materno" value="{{ voluntario.materno if voluntario else '' }}" class="input" />
+      </label>
+    </div>
+
+    <div>
+      <label class="flex flex-col w-full">
+        <span class="label">Celular</span>
+        <input name="celular" value="{{ voluntario.celular if voluntario else '' }}" class="input w-full" />
+      </label>
+    </div>
+
+    <div>
+      <label class="flex flex-col w-full">
+        <span class="label">Correo</span>
+        <input name="correo" type="email" value="{{ voluntario.correo if voluntario else '' }}" class="input w-full" />
+      </label>
+    </div>
+
+    <div>
+      <label class="select w-full">
+        <span class="label">Nivel de Educación</span>
+        <select name="id_nvl_edu">
+          <option value="">Seleccione nivel...</option>
+          {% for n in niveles %}
+          <option value="{{ n.id_nvl_edu }}" {% if voluntario and voluntario.id_nvl_edu == n.id_nvl_edu %}selected{% endif %}>{{ n.tipo }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <div class="btn btn-primary mt-6">
+    <button type="submit" class="btn btn-primary w-full">Guardar</button>
+  </div>
+</form>

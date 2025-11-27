@@ -1,0 +1,41 @@
+<form id="form" class="p-2 h-full flex flex-col" action="{% if inscripcion %}{{ url_for('inscripciones.editar', id=inscripcion.id_psct) }}{% else %}{{ url_for('inscripciones.crear') }}{% endif %}" method="post">
+  <h1 class="text-2xl font-semibold mb-4">{% if inscripcion %}Editar Inscripción{% else %}Crear Inscripción{% endif %}</h1>
+
+  {% if inscripcion %}
+  <input type="hidden" name="id_psct" value="{{ inscripcion.id_psct }}" />
+  {% endif %}
+
+  <div class="grid grid-cols-1 gap-4">
+    <div>
+      <label class="form-control w-full">
+        <span class="label">Curso/Taller</span>
+        <select name="id_curtal" class="select select-bordered w-full" required>
+          <option value="">Seleccione curso/taller...</option>
+          {% for c in cursos %}
+          <option value="{{ c.id_curtal }}" {% if inscripcion and inscripcion.id_curtal == c.id_curtal %}selected{% endif %}>
+            {{ c.curso_completo }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <div>
+      <label class="form-control w-full">
+        <span class="label">Participante</span>
+        <select name="id_participante" class="select select-bordered w-full" required>
+          <option value="">Seleccione participante...</option>
+          {% for p in participantes %}
+          <option value="{{ p.id_participante }}" {% if inscripcion and inscripcion.id_participante == p.id_participante %}selected{% endif %}>
+            {{ p.nombre_completo }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <div class="mt-8">
+    <button type="submit" class="btn btn-primary w-full">Guardar</button>
+  </div>
+</form>

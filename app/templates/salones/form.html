@@ -1,0 +1,36 @@
+<form id="form" class="p-2 h-full flex flex-col" action="{% if salon %}{{ url_for('salones.editar', id=salon.id_salon) }}{% else %}{{ url_for('salones.crear') }}{% endif %}" method="post">
+  <h1 class="text-2xl font-semibold mb-4">
+    {% if salon %}Editar Salón{% else %}Crear Salón{% endif %}
+  </h1>
+
+  {% if salon %}
+  <input type="hidden" name="id_salon" value="{{ salon.id_salon }}" />
+  {% endif %}
+
+  <div class="grid grid-cols-1 gap-4">
+    <div>
+      <label class="form-control w-full">
+        <span class="label-text mb-2">Nombre</span>
+        <input type="text" name="nombre" class="input input-bordered w-full" required value="{{ salon.nombre if salon else '' }}" />
+      </label>
+    </div>
+
+    <div>
+      <label class="form-control w-full">
+        <span class="label-text mb-2">Piso</span>
+        <input type="number" name="piso" class="input input-bordered w-full" required value="{{ salon.piso if salon else 0 }}" min="0" />
+      </label>
+    </div>
+
+    <div>
+      <label class="form-control w-full">
+        <span class="label-text mb-2">Capacidad</span>
+        <input type="number" name="capacidad" class="input input-bordered w-full" required value="{{ salon.capacidad if salon else 0 }}" min="0" />
+      </label>
+    </div>
+  </div>
+
+  <div class="mt-8">
+    <button type="submit" class="btn btn-primary w-full">Guardar</button>
+  </div>
+</form>

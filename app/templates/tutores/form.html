@@ -1,0 +1,128 @@
+<div class="card bg-base-100 shadow-xl max-w-2xl mx-auto">
+  <div class="card-body">
+    <h2 class="card-title text-2xl mb-4">
+      {% if tutor %}Editar Tutor{% else %}Crear Tutor{% endif %}
+    </h2>
+
+    <form
+      id="form-tutor"
+      method="POST"
+      action="{% if tutor %}{{ url_for('tutores.editar', id=tutor.id_tutor) }}{% else %}{{ url_for('tutores.crear') }}{% endif %}"
+    >
+      <!-- Información de la Persona -->
+      <div class="mb-6">
+        <h3 class="text-xl font-semibold mb-3">Información Personal</h3>
+
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text">Nombre</span>
+          </label>
+          <input
+            type="text"
+            name="nombre"
+            class="input input-bordered"
+            value="{% if tutor %}{{ tutor.nombre }}{% endif %}"
+            required
+          />
+        </div>
+
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text">Apellido Paterno</span>
+          </label>
+          <input
+            type="text"
+            name="paterno"
+            class="input input-bordered"
+            value="{% if tutor %}{{ tutor.paterno }}{% endif %}"
+            required
+          />
+        </div>
+
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text">Apellido Materno</span>
+          </label>
+          <input
+            type="text"
+            name="materno"
+            class="input input-bordered"
+            value="{% if tutor %}{{ tutor.materno }}{% endif %}"
+          />
+        </div>
+
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text">CI</span>
+          </label>
+          <input
+            type="text"
+            name="ci"
+            class="input input-bordered"
+            value="{% if tutor %}{{ tutor.ci }}{% endif %}"
+          />
+        </div>
+
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text">Sexo</span>
+          </label>
+          <select name="genero" class="select select-bordered" required>
+            <option value="">Seleccione...</option>
+            <option
+              value="M"
+              {% if tutor and tutor.genero == 'M' %}selected{% endif %}
+            >
+              Masculino
+            </option>
+            <option
+              value="F"
+              {% if tutor and tutor.genero == 'F' %}selected{% endif %}
+            >
+              Femenino
+            </option>
+          </select>
+        </div>
+
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text">Fecha de Nacimiento</span>
+          </label>
+          <input
+            type="date"
+            name="f_nacimiento"
+            class="input input-bordered"
+            value="{% if tutor %}{{ tutor.f_nacimiento }}{% endif %}"
+          />
+        </div>
+      </div>
+
+      <!-- Información del Tutor -->
+      <div class="mb-6">
+        <h3 class="text-xl font-semibold mb-3">Información del Tutor</h3>
+
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text">Parentesco</span>
+          </label>
+          <input
+            type="text"
+            name="parentesco"
+            class="input input-bordered"
+            value="{% if tutor %}{{ tutor.parentesco }}{% endif %}"
+            placeholder="Ej: Padre, Madre, Hermano, etc."
+          />
+        </div>
+      </div>
+
+      <div class="card-actions justify-end mt-6">
+        <button type="button" class="btn btn-ghost" onclick="history.back()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary">
+          {% if tutor %}Actualizar{% else %}Crear{% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

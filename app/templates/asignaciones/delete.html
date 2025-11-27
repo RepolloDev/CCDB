@@ -1,0 +1,13 @@
+<form method="post" action="{{ url_for('asignaciones.eliminar', id=asignacion.id_vps) }}" class="p-4">
+  <h2 class="text-xl font-semibold mb-4">Confirmar eliminación</h2>
+  <p class="mb-4">
+    ¿Estás seguro que deseas eliminar la asignación del servicio
+    <strong>{{ asignacion.nombre }}</strong> ({{ asignacion.cod_actividad }}) al voluntario
+    <strong>{{ asignacion.voluntario_asignado }}</strong>?
+  </p>
+
+  <div class="flex justify-center gap-4">
+    <a href="{{ url_for('asignaciones.index') }}" class="btn">Cancelar</a>
+    <button type="submit" class="btn btn-error">Eliminar</button>
+  </div>
+</form>
