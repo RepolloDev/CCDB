@@ -28,3 +28,13 @@ CREATE OR REPLACE VIEW tutores_select
      JOIN persona p ON p.id_persona = t.id_persona
   GROUP BY t.id_tutor, p.nombre, p.paterno, p.materno, t.parentesco
   ORDER BY ((((p.nombre::text || ' '::text) || p.paterno::text) || ' '::text) || p.materno::text);
+
+CREATE OR REPLACE VIEW voluntarios_publico
+AS
+	SELECT 	v.id_voluntario,
+			(((p.nombre::text || ' '::text) || p.paterno::text) || ' '::text) || p.materno::text AS nombre_completo,
+	    	v.correo,
+	    	ne.tipo
+	FROM voluntario v
+	JOIN persona p ON p.id_persona = v.id_persona
+	JOIN nivel_educacion ne ON ne.id_nvl_edu = v.id_nvl_edu
