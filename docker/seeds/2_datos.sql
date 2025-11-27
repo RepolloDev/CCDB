@@ -825,6 +825,37 @@ INSERT INTO aporte (id_aporte, monto_total, descripcion, f_creacion, f_edicion, 
 INSERT INTO aporte (id_aporte, monto_total, descripcion, f_creacion, f_edicion, id_participante) VALUES (79, 280, 'Aporte voluntario', TO_DATE('2024-01-05','YYYY-MM-DD'), TO_DATE('2023-08-22','YYYY-MM-DD'), 20);
 INSERT INTO aporte (id_aporte, monto_total, descripcion, f_creacion, f_edicion, id_participante) VALUES (80, 300, 'Colaboración económica', TO_DATE('2022-03-02','YYYY-MM-DD'), TO_DATE('2023-05-18','YYYY-MM-DD'), 9);
 
+INSERT INTO aporte (id_aporte, monto_total, descripcion, f_creacion, f_edicion, id_participante) 
+VALUES (81, 150, 'Donación anual', TO_DATE('2025-01-15','YYYY-MM-DD'), TO_DATE('2025-02-01','YYYY-MM-DD'), 5);
+
+INSERT INTO aporte (id_aporte, monto_total, descripcion, f_creacion, f_edicion, id_participante) 
+VALUES (82, 200, 'Aporte voluntario', TO_DATE('2025-02-10','YYYY-MM-DD'), TO_DATE('2025-02-20','YYYY-MM-DD'), 12);
+
+INSERT INTO aporte (id_aporte, monto_total, descripcion, f_creacion, f_edicion, id_participante) 
+VALUES (83, 300, 'Colaboración económica', TO_DATE('2025-03-05','YYYY-MM-DD'), TO_DATE('2025-03-15','YYYY-MM-DD'), 27);
+
+INSERT INTO aporte (id_aporte, monto_total, descripcion, f_creacion, f_edicion, id_participante) 
+VALUES (84, 120, 'Aporte mensual', TO_DATE('2025-04-20','YYYY-MM-DD'), TO_DATE('2025-04-25','YYYY-MM-DD'), 8);
+
+INSERT INTO aporte (id_aporte, monto_total, descripcion, f_creacion, f_edicion, id_participante) 
+VALUES (85, 250, 'Donación solidaria', TO_DATE('2025-05-18','YYYY-MM-DD'), TO_DATE('2025-05-22','YYYY-MM-DD'), 33);
+
+INSERT INTO aporte (id_aporte, monto_total, descripcion, f_creacion, f_edicion, id_participante) 
+VALUES (86, 180, 'Aporte voluntario', TO_DATE('2025-06-12','YYYY-MM-DD'), TO_DATE('2025-06-20','YYYY-MM-DD'), 19);
+
+INSERT INTO aporte (id_aporte, monto_total, descripcion, f_creacion, f_edicion, id_participante) 
+VALUES (87, 220, 'Colaboración económica', TO_DATE('2025-07-25','YYYY-MM-DD'), TO_DATE('2025-07-30','YYYY-MM-DD'), 2);
+
+INSERT INTO aporte (id_aporte, monto_total, descripcion, f_creacion, f_edicion, id_participante) 
+VALUES (88, 310, 'Aporte mensual', TO_DATE('2025-08-14','YYYY-MM-DD'), TO_DATE('2025-08-20','YYYY-MM-DD'), 14);
+
+INSERT INTO aporte (id_aporte, monto_total, descripcion, f_creacion, f_edicion, id_participante) 
+VALUES (89, 275, 'Donación solidaria', TO_DATE('2025-09-09','YYYY-MM-DD'), TO_DATE('2025-09-15','YYYY-MM-DD'), 21);
+
+INSERT INTO aporte (id_aporte, monto_total, descripcion, f_creacion, f_edicion, id_participante) 
+VALUES (90, 199, 'Aporte voluntario', TO_DATE('2025-10-28','YYYY-MM-DD'), TO_DATE('2025-11-05','YYYY-MM-DD'), 36);
+
+
 COMMIT;
 
 --* Historico de aportes

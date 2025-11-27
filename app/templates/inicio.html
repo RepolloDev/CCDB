@@ -13,24 +13,22 @@
 <div class="stats w-full bg-base-100 border-base-300 border">
   <div class="stat">
     <div class="stat-title">Cantidad de Cursos/Talleres</div>
-    <div class="stat-value">23</div>
-    <div class="stat-desc">Jan 1st - Mar 1st</div>
+    <div class="stat-value">{{ datos.cursos_talleres }}</div>
     <div class="stat-actions mt-1">
       <a href="/cursos_talleres" class="btn btn-xs">Ver cursos</a>
     </div>
   </div>
   <div class="stat">
     <div class="stat-title">Cantidad de Servicios</div>
-    <div class="stat-value">23</div>
-    <div class="stat-desc">Jan 1st - Mar 1st</div>
+    <div class="stat-value">{{ datos.servicios }}</div>
     <div class="stat-actions mt-1">
       <a href="/servicios" class="btn btn-xs">Ver servicios</a>
     </div>
   </div>
   <div class="stat">
     <div class="stat-title">Nuevos Participantes</div>
-    <div class="stat-value">32</div>
-    <div class="stat-desc">↗︎ 6 (22%)</div>
+    <div class="stat-value">{{ datos.participantes }}</div>
+    <div class="stat-desc">Cantidad del ultimo mes</div>
     <div class="stat-actions mt-1">
       <a href="/participantes" class="btn btn-xs">Ver participantes</a>
       <a href="/inscripciones" class="btn btn-xs btn-success"
@@ -40,8 +38,8 @@
   </div>
   <div class="stat">
     <div class="stat-title">Nuevos Voluntarios</div>
-    <div class="stat-value">13</div>
-    <div class="stat-desc">↗︎ 3 (23%)</div>
+    <div class="stat-value">{{ datos.voluntarios }}</div>
+    <div class="stat-desc">Cantidad del ultimo mes</div>
     <div class="stat-actions mt-1">
       <a href="/voluntarios" class="btn btn-xs">Ver voluntarios</a>
       <a href="/asignaciones" class="btn btn-xs btn-success"
@@ -66,14 +64,14 @@
             <div class="stat-figure">
               <box-icon name="money" size="lg"></box-icon>
             </div>
-            <div class="stat-value">Bs. 425</div>
-            <div class="stat-title">Ingresos en el mes</div>
+            <div class="stat-value">Bs. {{ datos.aporte_anual }}</div>
+            <div class="stat-title">Ingresos en el Año</div>
           </div>
           <div class="stat p-0 pt-2">
             <div class="stat-figure">
               <box-icon name="group" size="lg"></box-icon>
             </div>
-            <div class="stat-value">32</div>
+            <div class="stat-value">{{ datos.aportantes_anual }}</div>
             <div class="stat-title">Aportantes en el mes</div>
           </div>
         </div>
@@ -109,6 +107,9 @@
 </script>
 <script id="donut-data" type="application/json">
   {{ donut_data | tojson }}
+</script>
+<script id="datos" type="application/json">
+  {{ datos | tojson }}
 </script>
 <script
   defer

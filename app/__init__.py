@@ -60,22 +60,88 @@ def login():
 
 @app.route("/")
 def home():
-    # return to page inicio.html
-    chart_area_data = {
-        "categories": ["Ene", "Feb", "Mar", "Abr", "May"],
-        "series": [
-            {"name": "Aportes actuales", "data": [30, 40, 35, 50, 49]},
-            {"name": "Aportes del año pasado", "data": [10, 20, 15, 30, 25]},
-        ],
-    }
+    try:
+        query_sql = text("SELECT COUNT(*) as count FROM curso_taller")
+        result_proxy = db.session.execute(query_sql).fetchone()
+        cantidad_curso_taller = result_proxy[0]
+
+        query_sql = text("SELECT COUNT(*) as count FROM servicio")
+        result_proxy = db.session.execute(query_sql).fetchone()
+        cantidad_servicio = result_proxy[0]
+
+        query_sql = text("SELECT * FROM cantidad_participantes_mes")
+        result_proxy = db.session.execute(query_sql).fetchone()
+        cantidad_participante = result_proxy[0]
+
+        query_sql = text("SELECT * FROM cantidad_voluntarios_mes")
+        result_proxy = db.session.execute(query_sql).fetchone()
+        cantidad_voluntario = result_proxy[0]
+
+        query_sql = text("SELECT * FROM total_aportes_anio")
+        result_proxy = db.session.execute(query_sql).fetchone()
+        total_aporte_anual = result_proxy[0]
+
+        query_sql = text("SELECT * FROM cantidad_aportantes_anio")
+        result_proxy = db.session.execute(query_sql).fetchone()
+        cantidad_aportantes_anual = result_proxy[0]
+
+        datos_crudos = {
+            "cursos_talleres": cantidad_curso_taller,
+            "servicios": cantidad_servicio,
+            "participantes": cantidad_participante,
+            "voluntarios": cantidad_voluntario,
+            "aporte_anual": total_aporte_anual,
+            "aportantes_anual": cantidad_aportantes_anual
+        }
+    except Exception as e:
+        print("Error en la consulta:", e)
+        datos_crudos = {"cursos_talleres": 0, "servicios": 0}
+
+    try:
+        # --- consulta dinámica para el gráfico ---
+        query_sql = text("SELECT anio, mes, total FROM aportes_grafica")
+        resultados = db.session.execute(query_sql).fetchall()
+
+        # meses en español
+        categories = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"]
+
+        # diccionario para acumular datos por año
+        datos_por_anio = {}
+        for fila in resultados:
+            anio, mes, total = fila
+            if anio not in datos_por_anio:
+                datos_por_anio[anio] = [0]*12  # inicializa con 12 meses en 0
+            datos_por_anio[anio][int(mes)-1] = total  # coloca el total en el mes correcto
+
+        # construir series
+        series = []
+        for anio, valores in datos_por_anio.items():
+            series.append({
+                "name": f"{int(anio)}",
+                "data": valores
+            })
+
+        chart_area_data = {
+            "categories": categories,
+            "series": series
+        }
+
+    except Exception as e:
+        print("Error en la consulta", e)
+        chart_area_data = {}
+
     chart_donut_data = {
-        "series": [80, 10, 10],  # 80% Transacciones, 10% Venta, 10% Retorno
+        "series": [80, 10, 10],
         "labels": ["< 18", "18 - 35", "> 35"],
     }
 
     return render_template(
-        "inicio.html", area_data=chart_area_data, donut_data=chart_donut_data
+        "inicio.html",
+        area_data=chart_area_data,
+        donut_data=chart_donut_data,
+        datos=datos_crudos
     )
+
 
 
 # region PARTICIPANTES

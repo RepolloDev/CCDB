@@ -155,3 +155,44 @@ select
 from curso_taller ct
 join actividad a on a.id_actividad = ct.id_actividad
 order by a.cod_actividad;
+
+
+CREATE OR REPLACE VIEW cantidad_voluntarios_mes
+AS
+	SELECT COUNT(*) AS cantidad_voluntarios_mes
+	FROM voluntario v
+	JOIN persona per ON v.id_persona = per.id_persona
+	WHERE per.f_creacion >= date_trunc('month', CURRENT_DATE - interval '1 month')
+	  AND per.f_creacion < date_trunc('month', CURRENT_DATE);
+
+
+CREATE OR REPLACE VIEW cantidad_participantes_mes
+AS
+	SELECT COUNT(*) AS cantidad_participantes_mes
+	FROM participante p
+	JOIN persona per ON p.id_persona = per.id_persona
+	WHERE per.f_creacion >= date_trunc('month', CURRENT_DATE - interval '1 month')
+	  AND per.f_creacion < date_trunc('month', CURRENT_DATE);
+
+CREATE OR REPLACE VIEW total_aportes_anio
+AS
+	SELECT COALESCE(SUM(monto_total), 0) AS total_aportes_anio_actual
+	FROM aporte
+	WHERE f_creacion >= date_trunc('year', CURRENT_DATE);
+
+CREATE OR REPLACE VIEW cantidad_aportantes_anio
+AS
+	SELECT COUNT(DISTINCT id_participante) AS cantidad_aportantes_anio_actual
+	FROM aporte
+	WHERE f_creacion >= date_trunc('year', CURRENT_DATE);
+
+
+CREATE OR REPLACE VIEW aportes_grafica
+AS
+	SELECT 
+	    EXTRACT(YEAR FROM f_creacion) AS anio,
+	    EXTRACT(MONTH FROM f_creacion) AS mes,
+	    SUM(aporte.monto_total) AS total
+	FROM aporte
+	GROUP BY anio, mes
+	ORDER BY anio, mes;
