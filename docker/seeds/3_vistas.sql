@@ -89,3 +89,34 @@ select
     per.nombre || ' ' || per.paterno || ' ' || per.materno as nombre_completo
 from participante par
 join persona per on per.id_persona = par.id_persona;
+
+
+
+CREATE OR REPLACE VIEW cantidad_voluntarios_mes
+AS
+	SELECT COUNT(*) AS cantidad_voluntarios_mes
+	FROM voluntario v
+	JOIN persona per ON v.id_persona = per.id_persona
+	WHERE per.f_creacion >= date_trunc('month', CURRENT_DATE - interval '1 month')
+	  AND per.f_creacion < date_trunc('month', CURRENT_DATE);
+
+
+CREATE OR REPLACE VIEW cantidad_participantes_mes
+AS
+	SELECT COUNT(*) AS cantidad_participantes_mes
+	FROM participante p
+	JOIN persona per ON p.id_persona = per.id_persona
+	WHERE per.f_creacion >= date_trunc('month', CURRENT_DATE - interval '1 month')
+	  AND per.f_creacion < date_trunc('month', CURRENT_DATE);
+
+CREATE OR REPLACE VIEW total_aportes_anio
+AS
+	SELECT COALESCE(SUM(monto_total), 0) AS total_aportes_anio_actual
+	FROM aporte
+	WHERE f_creacion >= date_trunc('year', CURRENT_DATE);
+
+CREATE OR REPLACE VIEW cantidad_aportantes_anio
+AS
+	SELECT COUNT(DISTINCT id_participante) AS cantidad_aportantes_anio_actual
+	FROM aporte
+	WHERE f_creacion >= date_trunc('year', CURRENT_DATE);
