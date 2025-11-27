@@ -120,3 +120,14 @@ AS
 	SELECT COUNT(DISTINCT id_participante) AS cantidad_aportantes_anio_actual
 	FROM aporte
 	WHERE f_creacion >= date_trunc('year', CURRENT_DATE);
+
+
+CREATE OR REPLACE VIEW aportes_grafica
+AS
+	SELECT 
+	    EXTRACT(YEAR FROM f_creacion) AS anio,
+	    EXTRACT(MONTH FROM f_creacion) AS mes,
+	    SUM(aporte.monto_total) AS total
+	FROM aporte
+	GROUP BY anio, mes
+	ORDER BY anio, mes;

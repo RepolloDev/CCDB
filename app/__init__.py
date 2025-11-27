@@ -97,14 +97,39 @@ def home():
         print("Error en la consulta:", e)
         datos_crudos = {"cursos_talleres": 0, "servicios": 0}
 
-    chart_area_data = {
-        "categories": ["Ene", "Feb", "Mar", "Abr", "May"],
-        "series": [
-            {"name": "Aportes actuales", "data": [30, 40, 35, 50, 49]},
-            {"name": "Aportes del año pasado", "data": [10, 20, 15, 30, 25]},
-            {"name": "Aportes del año pasado 2", "data": [5, 25, 10, 35, 20]},
-        ],
-    }
+    try:
+        # --- consulta dinámica para el gráfico ---
+        query_sql = text("SELECT anio, mes, total FROM aportes_grafica")
+        resultados = db.session.execute(query_sql).fetchall()
+
+        # meses en español
+        categories = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"]
+
+        # diccionario para acumular datos por año
+        datos_por_anio = {}
+        for fila in resultados:
+            anio, mes, total = fila
+            if anio not in datos_por_anio:
+                datos_por_anio[anio] = [0]*12  # inicializa con 12 meses en 0
+            datos_por_anio[anio][int(mes)-1] = total  # coloca el total en el mes correcto
+
+        # construir series
+        series = []
+        for anio, valores in datos_por_anio.items():
+            series.append({
+                "name": f"{int(anio)}",
+                "data": valores
+            })
+
+        chart_area_data = {
+            "categories": categories,
+            "series": series
+        }
+
+    except Exception as e:
+        print("Error en la consulta", e)
+        chart_area_data = {}
+
     chart_donut_data = {
         "series": [80, 10, 10],
         "labels": ["< 18", "18 - 35", "> 35"],
