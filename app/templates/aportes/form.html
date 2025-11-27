@@ -1,0 +1,44 @@
+<form id="form" class="p-2 h-full flex flex-col" action="{% if aporte %}{{ url_for('aportes.editar', id=aporte.id_aporte) }}{% else %}{{ url_for('aportes.crear') }}{% endif %}" method="post">
+    <h1 class="text-2xl font-semibold mb-4">
+        {% if aporte %}Editar Aporte{% else %}Crear Aporte{% endif %}
+    </h1>
+	{% if aporte %}
+	<input type="hidden" name="id_aporte" value="{{ aporte.id_aporte }}" />
+	{% endif %}
+
+	<div class="grid grid-cols-1 gap-4">
+		<div>
+            <label class="input w-full">
+                <span class="label">Bs.</span>
+                <input type="number" min="0" step="0.5" name="monto_total" placeholder="Aporte" required value="{{ aporte.monto_total if aporte else '' }}" />
+            </label>
+		</div>
+
+		<div>
+			<label class="flex flex-col w-full">
+                <span class="label">Descripción</span>
+                <textarea name="descripcion" placeholder="Una descripcion..." class="textarea textarea-md w-full">{{ aporte.descripcion if aporte else '' }}</textarea>
+			</label>
+		</div>
+
+		<div>
+            <label class="select w-full">
+                <span class="label">Aportante</span>
+                <select name="id_participante" required>
+                    <option value="">Seleccione aportante...</option>
+                    {% for p in participantes %}
+                    <option value="{{ p.id_participante }}"
+                    {% if aporte and aporte.id_participante == p.id_participante %}
+                    selected
+                    {% endif %}>
+                        {{ p.nombre_completo }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </label>
+		</div>
+	</div>
+    <div class="btn btn-primary mt-6">
+			<button type="submit" class="btn btn-primary w-full">Guardar</button>
+	</div>
+</form>

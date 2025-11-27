@@ -1105,3 +1105,211 @@ INSERT INTO registro_historico_persona (id_usuario, id_persona, fecha, descripci
 VALUES (1, 96, TO_DATE('22/10/2025', 'DD/MM/YYYY'), 'agregado');
 
 commit;
+
+
+-- Sync serial sequences with current max ids to avoid duplicate key errors
+-- This sets each sequence last_value = max(id) so nextval() will return max+1
+-- Safe sequence sync: if table empty set sequence so nextval returns 1,
+-- otherwise set to current max and mark as called so next returns max+1.
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('horario','id_horario');
+BEGIN
+        SELECT MAX(id_horario) INTO m FROM horario;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('periodo','id_periodo');
+BEGIN
+        SELECT MAX(id_periodo) INTO m FROM periodo;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('salon','id_salon');
+BEGIN
+        SELECT MAX(id_salon) INTO m FROM salon;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('actividad','id_actividad');
+BEGIN
+        SELECT MAX(id_actividad) INTO m FROM actividad;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('persona','id_persona');
+BEGIN
+        SELECT MAX(id_persona) INTO m FROM persona;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('rol','id_rol');
+BEGIN
+        SELECT MAX(id_rol) INTO m FROM rol;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('nivel_educacion','id_nvl_edu');
+BEGIN
+        SELECT MAX(id_nvl_edu) INTO m FROM nivel_educacion;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('tutor','id_tutor');
+BEGIN
+        SELECT MAX(id_tutor) INTO m FROM tutor;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('usuario','id_usuario');
+BEGIN
+        SELECT MAX(id_usuario) INTO m FROM usuario;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('voluntario','id_voluntario');
+BEGIN
+        SELECT MAX(id_voluntario) INTO m FROM voluntario;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('participante','id_participante');
+BEGIN
+        SELECT MAX(id_participante) INTO m FROM participante;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('curso_taller','id_curtal');
+BEGIN
+        SELECT MAX(id_curtal) INTO m FROM curso_taller;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('servicio','id_servicio');
+BEGIN
+        SELECT MAX(id_servicio) INTO m FROM servicio;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('aporte','id_aporte');
+BEGIN
+        SELECT MAX(id_aporte) INTO m FROM aporte;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('registro_historico_aporte','id_rha');
+BEGIN
+        SELECT MAX(id_rha) INTO m FROM registro_historico_aporte;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('registro_historico_persona','id_rhp');
+BEGIN
+        SELECT MAX(id_rhp) INTO m FROM registro_historico_persona;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE m bigint; seq text := pg_get_serial_sequence('registro_historico_actividad','id_rhac');
+BEGIN
+        SELECT MAX(id_rhac) INTO m FROM registro_historico_actividad;
+        IF m IS NULL THEN
+                PERFORM setval(seq, 1, false);
+        ELSE
+                PERFORM setval(seq, m, true);
+        END IF;
+END$$;
+
+DO $$
+DECLARE exists_table int;
+BEGIN
+        -- registro_historico_curso_taller may not exist in all schemas; skip if absent
+        SELECT 1 INTO exists_table FROM pg_tables WHERE tablename = 'registro_historico_curso_taller';
+        IF exists_table = 1 THEN
+                PERFORM (CASE
+                        WHEN (SELECT MAX(id_rhct) FROM registro_historico_curso_taller) IS NULL THEN setval(pg_get_serial_sequence('registro_historico_curso_taller','id_rhct'), 1, false)
+                        ELSE setval(pg_get_serial_sequence('registro_historico_curso_taller','id_rhct'), (SELECT MAX(id_rhct) FROM registro_historico_curso_taller), true)
+                END);
+        END IF;
+END$$;
+
+COMMIT;

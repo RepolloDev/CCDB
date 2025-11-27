@@ -14,7 +14,7 @@ services:
       # Persist data
       - data:/var/lib/postgresql/data
       # Database initialization scripts
-      - ./seeds:/docker-entrypoint-initdb.d:Z,ro
+      # - ./seeds:/docker-entrypoint-initdb.d:Z,ro
     ports:
       - 5432:5432
 volumes:

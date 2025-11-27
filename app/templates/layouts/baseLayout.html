@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="silk">
+<html lang="en" data-theme="silk" class="h-full">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -48,6 +48,11 @@
       href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdn.jsdelivr.net/npm/solid-toast@0.5.0/dist/source/core/index.min.js"></script>
+    <script
+      src="{{ url_for('static', filename='js/flash_toasts.js') }}"
+      defer
+    ></script>
     <!--        Estilos personalizados       -->
     <style>
       * {
@@ -57,10 +62,14 @@
     <!-- Bloques para head personalizado -->
     {% block head %}{% endblock %}
   </head>
-  <body>
-    <!-- Para el contenido -->
+  <body class="h-full">
+    <!-- Contenido principal -->
     {% block body %}{% endblock %}
-    <!-- Scripts personalizados -->
+    <!-- Flash toasts -->
+    {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}
+    <!-- flashed messages as JSON for JS to consume -->
+    <script id="flashed-messages" type="application/json">{{ messages|tojson }}</script>
+    {% endif %}{% endwith %}
     {% block scripts %}{% endblock %}
   </body>
 </html>

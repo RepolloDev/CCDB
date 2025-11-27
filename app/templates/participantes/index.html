@@ -233,39 +233,16 @@
 </script>
 
 <script>
-  const jsonDataElement = document.getElementById("data");
-  const rawData = JSON.parse(jsonDataElement.textContent);
-  console.log(rawData)
+  generateTable([
+    "ID",
+    "Nombre",
+    "Carnet",
+    "Matricula",
+    "Estado",
+    "Tutor",
+    "Acciones",
+  ]);
 
-  const grid = new gridjs.Grid({
-    columns: [
-      "ID",
-      "Nombre",
-      "Carnet",
-      "Matricula",
-      "Estado",
-      "Tutor",
-      "Acciones",
-    ],
-    data: rawData.map((row) => [
-      row[0], // ID
-      row[1], // Nombre
-      row[2], // Carnet
-      row[3], // Matricula
-      row[4], // Estado
-      row[5], // Tutor
-      gridjs.html(`
-          <div class="flex gap-2">
-            <button class="btn btn-info" data-id="${row[0]}">Editar</button>
-            <button class="btn btn-error" data-id="${row[0]}">Eliminar</button>
-          </div>
-        `),
-    ]),
-    search: true,
-    pagination: { enabled: true, limit: 10 },
-  });
-
-  grid.render(document.getElementById("table-data"));
   // Submit del formulario del modal
   document
     .getElementById("formNuevoParticipante")

@@ -1,12 +1,11 @@
 {% extends "layouts/crudLayout.html" %}
-<!-- Title -->
 {% block title %}
 <span>Servicios</span>
 {% endblock %}
-<!-- Content -->
 {% block content %}
+
+<!-- ======= ESTADÍSTICAS ======= -->
 <div>
-  <!-- Statistics -->
   <div class="stats border border-base-300 w-full">
     <div class="stat">
       <div class="stat-figure text-primary">
@@ -18,42 +17,113 @@
     </div>
   </div>
 </div>
-<!-- Table -->
+
+<!-- Botón Registrar -->
+<div class="flex justify-end mb-4">
+  <label for="modalNuevoServicio" class="btn btn-primary">
+    <box-icon name="briefcase"></box-icon>
+    Registrar nuevo servicio
+  </label>
+</div>
+
+<!-- ======= MODAL ======= -->
+<input type="checkbox" id="modalNuevoServicio" class="modal-toggle" />
+<div class="modal">
+  <div class="modal-box w-11/12 max-w-3xl">
+    <h3 class="font-bold text-lg">Registrar Nuevo Servicio</h3>
+
+    <form id="formNuevoServicio">
+      <div class="py-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="label">
+              <span class="label-text">Actividad</span>
+            </label>
+            <select name="id_actividad" class="select select-bordered w-full" required>
+              <option value="">Seleccione actividad...</option>
+              {% for a in actividades %}
+              <option value="{{ a.id_actividad }}">{{ a.cod_actividad }} - {{ a.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div>
+            <label class="label">
+              <span class="label-text">Tipo</span>
+            </label>
+            <input type="text" name="tipo" class="input input-bordered w-full" required />
+          </div>
+
+          <div>
+            <label class="label">
+              <span class="label-text">Estado</span>
+            </label>
+            <select name="estado" class="select select-bordered w-full" required>
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-action">
+        <label for="modalNuevoServicio" class="btn">Cancelar</label>
+        <button type="submit" class="btn btn-primary">
+          Guardar Servicio
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== TABLA ===== -->
 <div>
   <h2 class="my-8 text-2xl font-semibold">Vista general</h2>
   <div class="overflow-x-auto">
-    <div id="servicios-table"></div>
+    <div id="table-data"></div>
   </div>
 </div>
+
 {% endblock %}
-<!-- Scripts -->
 {% block scripts %}
-<script id="servicios-data" type="application/json">
+<script id="data" type="application/json">
   {{ data | tojson }}
 </script>
+
 <script>
-  const jsonDataElement = document.getElementById("servicios-data");
-  const rawData = JSON.parse(jsonDataElement.textContent);
+  generateTable([
+    "ID",
+    "Código Actividad",
+    "Nombre",
+    "Tipo",
+    "Estado",
+    "Acciones",
+  ]);
 
-  const grid = new gridjs.Grid({
-    columns: ["ID", "Código Actividad", "Nombre", "Tipo", "Estado", "Acciones"],
-    data: rawData.map((row) => [
-      row[0], // ID
-      row[1], // Código Actividad
-      row[2], // Nombre
-      row[3], // Tipo
-      row[4], // Estado
-      gridjs.html(`
-        <div class="flex gap-2">
-          <button class="btn btn-info" data-id="${row[0]}">Editar</button>
-          <button class="btn btn-error" data-id="${row[0]}">Eliminar</button>
-        </div>
-      `),
-    ]),
-    search: true,
-    pagination: { enabled: true, limit: 10 },
-  });
+  // Submit del formulario del modal
+  document
+    .getElementById("formNuevoServicio")
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-  grid.render(document.getElementById("servicios-table"));
+      const form = new FormData(e.target);
+      const data = Object.fromEntries(form.entries());
+
+      const res = await fetch("/servicios/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        alert(json.error);
+        return;
+      }
+
+      alert("Servicio creado correctamente");
+      location.reload();
+    });
 </script>
 {% endblock %}

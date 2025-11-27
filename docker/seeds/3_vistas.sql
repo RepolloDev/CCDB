@@ -37,4 +37,55 @@ AS
 	    	ne.tipo
 	FROM voluntario v
 	JOIN persona p ON p.id_persona = v.id_persona
-	JOIN nivel_educacion ne ON ne.id_nvl_edu = v.id_nvl_edu
+	JOIN nivel_educacion ne ON ne.id_nvl_edu = v.id_nvl_edu;
+
+
+CREATE OR REPLACE VIEW inscripciones_publico
+AS
+	SELECT  a.cod_actividad, a.nombre, pa.matricula ,p.nombre||' '||p.paterno||' '||p.materno AS participante
+	FROM participante_seregistra_curso_taller pct
+	JOIN curso_taller ct ON ct.id_curtal = pct.id_curtal
+	JOIN actividad a ON a.id_actividad = ct.id_actividad
+	JOIN participante pa ON pa.id_participante = pct.id_participante
+	JOIN persona p ON p.id_persona = pa.id_persona;
+
+CREATE OR REPLACE VIEW aportes_publico
+AS
+	SELECT 	a.id_aporte,a.monto_total, a.descripcion, a.f_creacion, a.f_edicion,
+    p.nombre||' '||p.paterno::text ||' '||p.materno AS nombre_completo
+   	FROM aporte a
+	JOIN participante pa ON pa.id_participante = a.id_participante
+	JOIN persona p ON p.id_persona = pa.id_persona;
+
+CREATE OR REPLACE VIEW aportes_publico
+AS
+	SELECT 	a.id_aporte,a.monto_total, a.descripcion, a.f_creacion, a.f_edicion,
+    p.nombre||' '||p.paterno::text||' '||p.materno AS nombre_completo
+   	FROM aporte a
+	JOIN participante pa ON pa.id_participante = a.id_participante
+	JOIN persona p ON p.id_persona = pa.id_persona;
+
+
+CREATE OR REPLACE VIEW asignaciones_publico
+AS
+	SELECT a.cod_actividad, a.nombre, p.nombre || ' ' || p.paterno || ' ' || p.materno as voluntario_asignado, ne.tipo
+	FROM voluntario_participa_servicio vps
+	JOIN servicio s ON s.id_servicio = vps.id_servicio
+	JOIN actividad a ON a.id_actividad = s.id_actividad
+	JOIN voluntario v ON v.id_voluntario = vps.id_voluntario
+	JOIN persona p ON p.id_persona = v.id_persona
+	JOIN nivel_educacion ne ON ne.id_nvl_edu = v.id_nvl_edu;
+
+
+CREATE OR REPLACE VIEW servicios_publico
+AS
+	SELECT s.id_servicio, a.cod_actividad, a.nombre, s.tipo, s.estado
+	FROM servicio s
+	JOIN actividad a ON a.id_actividad = s.id_actividad;
+
+create or replace view opt_participante_public as
+select
+    par.id_participante,
+    per.nombre || ' ' || per.paterno || ' ' || per.materno as nombre_completo
+from participante par
+join persona per on per.id_persona = par.id_persona;

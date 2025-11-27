@@ -1,61 +1,59 @@
-{% extends "layouts/crudLayout.html" %}
-<!-- Title -->
-{% block title %}
+{% extends "layouts/crudLayout.html" %} {% block title %}
 <span>Aportes</span>
-{% endblock %}
+{% endblock %} {% block content %}
 
-<!-- Content -->
-{% block content %}
+<!-- ======= ESTADÍSTICAS ======= -->
 <div>
-  <!-- Statistics -->
   <div class="stats border border-base-300 w-full">
     <div class="stat">
       <div class="stat-figure text-primary">
-        <box-icon name="user-plus" size="lg"></box-icon>
+        <box-icon name="wallet" size="lg"></box-icon>
       </div>
       <div class="stat-title">Total de aportes</div>
-      <div class="stat-value text-primary">102</div>
+      <div class="stat-value text-primary">{{ data|length }}</div>
       <div class="stat-desc">Registrados en todo el tiempo</div>
     </div>
-
-    <div class="stat">
-      <div class="stat-figure text-secondary">
-        <box-icon name="show" size="lg"></box-icon>
-      </div>
-      <div class="stat-title">Aportes activos</div>
-      <div class="stat-value text-secondary">51</div>
-      <div class="stat-desc">50% del total</div>
-    </div>
-
-    <div class="stat">
-      <div class="stat-figure text-secondary">
-        <box-icon type="solid" name="baby-carriage" size="lg"></box-icon>
-      </div>
-      <div class="stat-value">32</div>
-      <div class="stat-title">Aportes de menores</div>
-      <div class="stat-desc text-secondary">31% del total</div>
-    </div>
   </div>
 </div>
 
-<!-- Table -->
+<!-- ===== TABLA ===== -->
 <div>
   <h2 class="my-8 text-2xl font-semibold">Vista general</h2>
+  <div class="mb-2">
+    <button
+      class="btn btn-primary btn-lg"
+      data-ref="{{ url_for('aportes.crear') }}"
+    >
+      Agregar
+    </button>
+  </div>
   <div class="overflow-x-auto">
-    <div id="aportes-table"></div>
+    <div id="table-data"></div>
   </div>
 </div>
-{% endblock %}
 
-<!-- Scripts -->
-{% block scripts %}
-<script id="aportes-data" type="application/json">
+{% endblock %} {% block scripts %}
+<script id="data" type="application/json">
   {{ data | tojson }}
 </script>
+
 <script>
-  const jsonData = JSON.parse(document.getElementById("aportes-data").textContent);
-  const columns = jsonData.columns;
-  const data = jsonData.data;
-  createTable(columns, data, "aportes-table");
+  // URL templates injected from Flask so client JS can build endpoints for each row.
+  // Use the placeholder __ID__ which will be replaced with the real id.
+  const APORTE_EDIT_URL_TEMPLATE =
+    "{{ url_for('aportes.editar', id=0).replace('/0','/__ID__') }}";
+  const APORTE_DELETE_URL_TEMPLATE =
+    "{{ url_for('aportes.eliminar', id=0).replace('/0','/__ID__') }}";
+  const APORTE_CREATE_URL = "{{ url_for('aportes.crear') }}";
+
+  generateTable([
+    "ID",
+    "Monto total",
+    "Descripción",
+    "Fecha Creación",
+    "Fecha Edición",
+    "Aportante",
+    "Acciones",
+  ]);
 </script>
 {% endblock %}

@@ -12,11 +12,12 @@
 <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
 <script src="{{ url_for('static', filename='js/table.js') }}"></script>
 <script defer src="{{ url_for('static', filename='js/modal.js') }}"></script>
+<script src="{{ url_for('static', filename='js/generate.js') }}"></script>
 {% endblock %}
 <!-- Modal -->
 {% block modal %}
 <dialog id="modal" class="modal">
-  <div class="modal-box">
+  <div class="modal-box overflow-visible">
     <form method="dialog">
       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
         <box-icon name="window-close"></box-icon>
@@ -24,7 +25,10 @@
     </form>
     <div id="modal-content">
       <h3>Formulario</h3>
-      <iframe id="modal-iframe" title="form" src=""></iframe>
+      <!-- Inline container where fetched form HTML will be injected. -->
+      <div id="modal-content-area" class="w-full overflow-auto max-h-[60vh] p-2 bg-base-100 rounded">
+        <div id="modal-loader" class="py-8 text-center text-sm opacity-60">Cargando formulario...</div>
+      </div>
     </div>
   </div>
 </dialog>

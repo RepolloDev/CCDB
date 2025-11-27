@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, jsonify
 from sqlalchemy import text
 from urllib.parse import quote_plus
@@ -5,7 +6,20 @@ from flask import Flask, render_template, request, jsonify
 from sqlalchemy.exc import IntegrityError
 from .db import Database
 
-# from .routes.cursos_talleres import cursos_talleres_bp
+
+from .routes.cursos_talleres import cursos_talleres_bp
+from .routes.inscripciones import inscripciones_bp
+from .routes.participantes import participantes_bp
+from .routes.salones import salones_bp
+from .routes.servicios import servicios_bp
+from .routes.aportes import aportes_bp
+from .routes.horarios import horarios_bp
+from .routes.periodos import periodos_bp
+
+from .routes.voluntarios import voluntarios_bp
+from .routes.tutores import tutores_bp
+from .routes.asignaciones import asignaciones_bp
+
 from datetime import date
 
 
@@ -13,9 +27,21 @@ from datetime import date
 print("DATABASE_URL:", Database.make_database_uri())
 
 app = Flask(__name__)
+# Secret key is required for session/flash to work. Use environment variable in production.
+app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-this")
 db = Database.init_app(app)
 
-# app.register_blueprint(cursos_talleres_bp)
+app.register_blueprint(cursos_talleres_bp)
+app.register_blueprint(participantes_bp)
+app.register_blueprint(inscripciones_bp)
+app.register_blueprint(voluntarios_bp)
+app.register_blueprint(tutores_bp)
+app.register_blueprint(salones_bp)
+app.register_blueprint(servicios_bp)
+app.register_blueprint(aportes_bp)
+app.register_blueprint(horarios_bp)
+app.register_blueprint(periodos_bp)
+app.register_blueprint(asignaciones_bp)
 
 
 @app.route("/test")
@@ -66,6 +92,7 @@ AS
 """
 
 
+"""
 @app.route("/participantes")
 def participantes():
     # Participantes
@@ -141,7 +168,7 @@ def crear_participante():
                 f"[INFO] Persona existente encontrada: id_persona={id_persona}, CI={data['ci']}"
             )
             db.session.execute(
-                text("""
+                text(\"\"\"
                     UPDATE persona SET
                         nombre = :nombre,
                         paterno = :paterno,
@@ -154,7 +181,7 @@ def crear_participante():
                         nro = :nro,
                         f_edicion = now()
                     WHERE id_persona = :idp
-                """),
+                \"\"\"),
                 {
                     "nombre": data["nombre"],
                     "paterno": data["paterno"],
@@ -173,11 +200,11 @@ def crear_participante():
             )
         else:
             # -------- INSERTAR NUEVA PERSONA --------
-            persona_sql = text("""
+            persona_sql = text(\"\"\"
                 INSERT INTO persona (nombre, paterno, materno, ci, celular, genero, f_nacimiento, zona, calle, nro)
                 VALUES (:nombre, :paterno, :materno, :ci, :celular, :genero, :fn, :zona, :calle, :nro)
                 RETURNING id_persona
-            """)
+            \"\"\")
             res = db.session.execute(
                 persona_sql,
                 {
@@ -223,11 +250,11 @@ def crear_participante():
             )
         else:
             # -------- INSERTAR PARTICIPANTE --------
-            participante_sql = text("""
+            participante_sql = text(\"\"\"
                 INSERT INTO participante (id_persona, estado, id_tutor)
                 VALUES (:idp, :estado, :idt)
                 RETURNING matricula
-            """)
+            \"\"\")
             res_part = db.session.execute(
                 participante_sql,
                 {
@@ -259,6 +286,7 @@ def crear_participante():
         db.session.rollback()
         print(f"[ERROR] Exception: {e}")
         return jsonify({"error": str(e)}), 500
+"""
 
 
 """
@@ -274,20 +302,20 @@ AS
 """
 
 
-@app.route("/voluntarios")
-def voluntarios():
-    try:
-        query_sql = text("SELECT * FROM voluntarios_publico")
-        result_proxy = db.session.execute(query_sql)
-        datos_crudos = [
-            [row["id_voluntario"], row["nombre_completo"], row["correo"], row["tipo"]]
-            for row in result_proxy.mappings()
-        ]
-    except Exception as e:
-        print("Error en la consulta:", e)
-        datos_crudos = []
+# @app.route("/voluntarios")
+# def voluntarios():
+#     try:
+#         query_sql = text("SELECT * FROM voluntarios_publico")
+#         result_proxy = db.session.execute(query_sql)
+#         datos_crudos = [
+#             [row["id_voluntario"], row["nombre_completo"], row["correo"], row["tipo"]]
+#             for row in result_proxy.mappings()
+#         ]
+#     except Exception as e:
+#         print("Error en la consulta:", e)
+#         datos_crudos = []
 
-    return render_template("voluntarios/index.html", data=datos_crudos)
+#     return render_template("voluntarios/index.html", data=datos_crudos)
 
 
 """
@@ -301,20 +329,20 @@ AS
 """
 
 
-@app.route("/tutores")
-def tutores():
-    try:
-        query_sql = text("SELECT * FROM tutores_publico")
-        result_proxy = db.session.execute(query_sql)
-        datos_crudos = [
-            [row["id_tutor"], row["nombre_completo"], row["parentesco"]]
-            for row in result_proxy.mappings()
-        ]
-    except Exception as e:
-        print("Error en la consulta:", e)
-        datos_crudos = []
+# @app.route("/tutores")
+# def tutores():
+#     try:
+#         query_sql = text("SELECT * FROM tutores_publico")
+#         result_proxy = db.session.execute(query_sql)
+#         datos_crudos = [
+#             [row["id_tutor"], row["nombre_completo"], row["parentesco"]]
+#             for row in result_proxy.mappings()
+#         ]
+#     except Exception as e:
+#         print("Error en la consulta:", e)
+#         datos_crudos = []
 
-    return render_template("tutores/index.html", data=datos_crudos)
+#     return render_template("tutores/index.html", data=datos_crudos)
 
 
 # endregion
@@ -332,26 +360,26 @@ AS
 """
 
 
-@app.route("/cursos_talleres")
-def cursos_talleres():
-    try:
-        query_sql = text("SELECT * FROM cursos_talleres_publico")
-        result_proxy = db.session.execute(query_sql)
-        datos_crudos = [
-            [
-                row["id_curtal"],
-                row["cod_actividad"],
-                row["nombre"],
-                row["enlace"],
-                row["voluntario"],
-            ]
-            for row in result_proxy.mappings()
-        ]
-    except Exception as e:
-        print("Error en la consulta: ", e)
-        datos_crudos = []
+# @app.route("/cursos_talleres")
+# def cursos_talleres():
+#     try:
+#         query_sql = text("SELECT * FROM cursos_talleres_publico")
+#         result_proxy = db.session.execute(query_sql)
+#         datos_crudos = [
+#             [
+#                 row["id_curtal"],
+#                 row["cod_actividad"],
+#                 row["nombre"],
+#                 row["enlace"],
+#                 row["voluntario"],
+#             ]
+#             for row in result_proxy.mappings()
+#         ]
+#     except Exception as e:
+#         print("Error en la consulta: ", e)
+#         datos_crudos = []
 
-    return render_template("cursos_talleres/index.html", data=datos_crudos)
+#     return render_template("cursos_talleres/index.html", data=datos_crudos)
 
 
 """
@@ -363,40 +391,40 @@ AS
 """
 
 
-@app.route("/servicios")
-def servicios():
-    try:
-        query_sql = text("SELECT * FROM servicios_publico")
-        result_proxy = db.session.execute(query_sql)
-        datos_crudos = [
-            [
-                row["id_servicio"],
-                row["cod_actividad"],
-                row["nombre"],
-                row["tipo"],
-                row["estado"],
-            ]
-            for row in result_proxy.mappings()
-        ]
-    except Exception as e:
-        print("Error en la consulta:", e)
-        datos_crudos = []
+# @app.route("/servicios")
+# def servicios():
+#     try:
+#         query_sql = text("SELECT * FROM servicios_publico")
+#         result_proxy = db.session.execute(query_sql)
+#         datos_crudos = [
+#             [
+#                 row["id_servicio"],
+#                 row["cod_actividad"],
+#                 row["nombre"],
+#                 row["tipo"],
+#                 row["estado"],
+#             ]
+#             for row in result_proxy.mappings()
+#         ]
+#     except Exception as e:
+#         print("Error en la consulta:", e)
+#         datos_crudos = []
 
-    return render_template("servicios/index.html", data=datos_crudos)
+#     return render_template("servicios/index.html", data=datos_crudos)
 
 
 # endregion
 
 
 # region Operaciones
-@app.route("/inscripciones")
-def inscripciones():
-    return render_template("inscripciones.html")
+# @app.route("/inscripciones")
+# def inscripciones():
+#     return render_template("inscripciones.html")
 
 
-@app.route("/asignaciones")
-def asignaciones():
-    return render_template("asignaciones.html")
+# @app.route("/asignaciones")
+# def asignaciones():
+#     return render_template("asignaciones.html")
 
 
 """
@@ -464,14 +492,14 @@ AS
 #     return render_template("periodos/index.html", data=datos_crudos)
 
 
-@app.route("/salones")
-def salones():
-    return render_template("salones.html")
+# @app.route("/salones")
+# def salones():
+#     return render_template("salones.html")
 
 
-@app.route("/horarios")
-def horarios():
-    return render_template("horarios.html")
+# @app.route("/horarios")
+# def horarios():
+#     return render_template("horarios.html")
 
 
 # endregion

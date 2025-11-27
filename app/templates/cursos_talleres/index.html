@@ -1,86 +1,135 @@
 {% extends "layouts/crudLayout.html" %}
-<!-- Title -->
 {% block title %}
 <span>Cursos y Talleres</span>
 {% endblock %}
-<!-- Content -->
 {% block content %}
+
+<!-- ======= ESTADÍSTICAS ======= -->
 <div>
-  <!-- Statistics -->
   <div class="stats border border-base-300 w-full">
     <div class="stat">
       <div class="stat-figure text-primary">
         <box-icon type="solid" name="buildings" size="lg"></box-icon>
       </div>
       <div class="stat-title">Total de Cursos y Talleres</div>
-      <div class="stat-value text-primary">{{r1}}</div>
+      <div class="stat-value text-primary">{{ data|length }}</div>
       <div class="stat-desc">Registrados en todo el tiempo</div>
-    </div>
-
-    <div class="stat">
-      <div class="stat-figure text-secondary">
-        <box-icon type="solid" name="buildings" size="lg"></box-icon>
-      </div>
-      <div class="stat-title">Participantes activos</div>
-      <div class="stat-value text-secondary">51</div>
-      <div class="stat-desc">50% del total</div>
-    </div>
-
-    <div class="stat">
-      <div class="stat-figure text-secondary">
-        <box-icon type="solid" name="baby-carriage" size="lg"></box-icon>
-      </div>
-      <div class="stat-value">32</div>
-      <div class="stat-title">Menores de edad</div>
-      <div class="stat-desc text-secondary">31% del total</div>
     </div>
   </div>
 </div>
-<!-- Table -->
+
+<!-- Botón Registrar -->
+<div class="flex justify-end mb-4">
+  <label for="modalNuevoCursoTaller" class="btn btn-primary">
+    <box-icon name="plus-circle"></box-icon>
+    Registrar nuevo curso/taller
+  </label>
+</div>
+
+<!-- ======= MODAL ======= -->
+<input type="checkbox" id="modalNuevoCursoTaller" class="modal-toggle" />
+<div class="modal">
+  <div class="modal-box w-11/12 max-w-3xl">
+    <h3 class="font-bold text-lg">Registrar Nuevo Curso/Taller</h3>
+
+    <form id="formNuevoCursoTaller">
+      <div class="py-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="label">
+              <span class="label-text">Actividad</span>
+            </label>
+            <select name="id_actividad" class="select select-bordered w-full" required>
+              <option value="">Seleccione actividad...</option>
+              {% for a in actividades %}
+              <option value="{{ a.id_actividad }}">{{ a.cod_actividad }} - {{ a.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div>
+            <label class="label">
+              <span class="label-text">Voluntario</span>
+            </label>
+            <select name="id_voluntario" class="select select-bordered w-full" required>
+              <option value="">Seleccione voluntario...</option>
+              {% for v in voluntarios %}
+              <option value="{{ v.id_voluntario }}">{{ v.nombre_completo }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div>
+            <label class="label">
+              <span class="label-text">Salón</span>
+            </label>
+            <select name="id_salon" class="select select-bordered w-full" required>
+              <option value="">Seleccione salón...</option>
+              {% for s in salones %}
+              <option value="{{ s.id_salon }}">{{ s.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-action">
+        <label for="modalNuevoCursoTaller" class="btn">Cancelar</label>
+        <button type="submit" class="btn btn-primary">
+          Guardar Curso/Taller
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== TABLA ===== -->
 <div>
   <h2 class="my-8 text-2xl font-semibold">Vista general</h2>
-  <button class="btn btn-primary btn-lg mb-2" data-action="add">Agregar</button>
-  <!-- Table of participants -->
   <div class="overflow-x-auto">
     <div id="table-data"></div>
   </div>
 </div>
+
 {% endblock %}
-<!-- Scripts -->
 {% block scripts %}
 <script id="data" type="application/json">
   {{ data | tojson }}
 </script>
+
 <script>
-  const jsonDataElement = document.getElementById("data");
-  const rawData = JSON.parse(jsonDataElement.textContent);
+  generateTable([
+    "ID",
+    "Nombre",
+    "Voluntario",
+    "Salón",
+    "Acciones",
+  ]);
 
-  const grid = new gridjs.Grid({
-    columns: [
-      "ID",
-      "Código Actividad",
-      "Nombre",
-      "Enlace",
-      "Voluntario",
-      "Acciones",
-    ],
-    data: rawData.map((row) => [
-      row[0], // ID
-      row[1], // Código Actividad
-      row[2], // Nombre
-      gridjs.html(`<a href="" target="_blank">${row[3]}</a>`), // Enlace como <a>
-      row[4], // Voluntario
-      gridjs.html(`
-        <div class="flex gap-2">
-            <button class="btn btn-info" data-id="${row[0]}">Editar</button>
-            <button class="btn btn-error" data-id="${row[0]}">Eliminar</button>
-        </div>
-        `),
-    ]),
-    search: true,
-    pagination: { enabled: true, limit: 10 },
-  });
+  // Submit del formulario del modal
+  document
+    .getElementById("formNuevoCursoTaller")
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-  grid.render(document.getElementById("table-data"));
+      const form = new FormData(e.target);
+      const data = Object.fromEntries(form.entries());
+
+      const res = await fetch("/cursos_talleres/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        alert(json.error);
+        return;
+      }
+
+      alert("Curso/Taller creado correctamente");
+      location.reload();
+    });
 </script>
 {% endblock %}
