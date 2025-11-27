@@ -1,10 +1,12 @@
 <form id="form" class="p-2 h-full flex flex-col" action="{% if voluntario %}{{ url_for('voluntarios.editar', id=voluntario.id_voluntario) }}{% else %}{{ url_for('voluntarios.crear') }}{% endif %}" method="post">
   <h1 class="text-2xl font-semibold mb-4">{% if voluntario %}Editar Voluntario{% else %}Crear Voluntario{% endif %}</h1>
+
   {% if voluntario %}
   <input type="hidden" name="id_voluntario" value="{{ voluntario.id_voluntario }}" />
   {% endif %}
 
   <div class="grid grid-cols-1 gap-4">
+
     <div>
       <label class="flex flex-col w-full">
         <span class="label">CI</span>
@@ -27,10 +29,41 @@
       </label>
     </div>
 
-    <div>
-      <label class="flex flex-col w-full">
+    <div class="grid grid-cols-2 gap-2">
+      <label class="flex flex-col">
         <span class="label">Celular</span>
-        <input name="celular" value="{{ voluntario.celular if voluntario else '' }}" class="input w-full" />
+        <input name="celular" value="{{ voluntario.celular if voluntario else '' }}" class="input" />
+      </label>
+      <label class="flex flex-col">
+        <span class="label">Género</span>
+        <select name="genero" class="input">
+          <option value="">Seleccione...</option>
+          <option value="Masculino" {% if voluntario and voluntario.genero=='Masculino' %}selected{% endif %}>Masculino</option>
+          <option value="Femenino" {% if voluntario and voluntario.genero=='Femenino' %}selected{% endif %}>Femenino</option>
+          <option value="Otro" {% if voluntario and voluntario.genero=='Otro' %}selected{% endif %}>Otro</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2">
+      <label class="flex flex-col">
+        <span class="label">Fecha de Nacimiento</span>
+        <input type="date" name="fecha_nacimiento" value="{{ voluntario.f_nacimiento if voluntario else '' }}" class="input" />
+      </label>
+      <label class="flex flex-col">
+        <span class="label">Zona / Barrio</span>
+        <input name="barrio" value="{{ voluntario.zona if voluntario else '' }}" class="input" />
+      </label>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2">
+      <label class="flex flex-col">
+        <span class="label">Calle</span>
+        <input name="calle" value="{{ voluntario.calle if voluntario else '' }}" class="input" />
+      </label>
+      <label class="flex flex-col">
+        <span class="label">Número</span>
+        <input name="nro_casa" value="{{ voluntario.nro if voluntario else '' }}" class="input" />
       </label>
     </div>
 
@@ -52,6 +85,7 @@
         </select>
       </label>
     </div>
+
   </div>
 
   <div class="btn btn-primary mt-6">
