@@ -4,6 +4,7 @@ from sqlalchemy import text
 from urllib.parse import quote_plus
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 
@@ -149,14 +150,53 @@ def tutores():
 
 
 # region Actividades
+
+"""
+CREATE OR REPLACE VIEW cursos_talleres_publico
+AS
+	SELECT ct.id_curtal, a.cod_actividad, a.nombre, ct.enlace, p.nombre||' '||p.paterno||' '||p.materno AS voluntario
+	FROM curso_taller ct
+	JOIN actividad a ON a.id_actividad = ct.id_actividad
+	JOIN voluntario v ON v.id_voluntario = ct.id_voluntario
+	JOIN persona p ON p.id_persona = v.id_persona
+"""
 @app.route("/cursos_talleres")
 def cursos_talleres():
-    return render_template("cursos_talleres.html")
+    try:
+        query_sql = text("SELECT * FROM cursos_talleres_publico")
+        result_proxy = db.session.execute(query_sql)
+        datos_crudos = [
+            [row["id_curtal"],row["cod_actividad"],row["nombre"],row["enlace"],row["voluntario"]]
+            for row in result_proxy.mappings()
+        ]
+    except Exception as e:
+        print("Error en la consulta: ",e)
+        datos_crudos = []
+
+    return render_template("cursos_talleres/index.html", data=datos_crudos)
 
 
+"""
+CREATE OR REPLACE VIEW servicios_publico
+AS
+	SELECT s.id_servicio, a.cod_actividad, a.nombre, s.tipo, s.estado
+	FROM servicio s 
+	JOIN actividad a ON a.id_actividad = s.id_actividad
+"""
 @app.route("/servicios")
 def servicios():
-    return render_template("servicios.html")
+    try:
+        query_sql = text("SELECT * FROM servicios_publico")
+        result_proxy = db.session.execute(query_sql)
+        datos_crudos = [
+            [row["id_servicio"], row["cod_actividad"], row["nombre"], row["tipo"], row["estado"]]
+            for row in result_proxy.mappings()
+        ]
+    except Exception as e:
+        print("Error en la consulta:", e)
+        datos_crudos = []
+    
+    return render_template("servicios/index.html", data=datos_crudos)
 
 
 # endregion
@@ -209,9 +249,26 @@ def aportes():
 
 
 # region Organización
+
 @app.route("/periodos")
 def periodos():
-    return render_template("periodos.html")
+    try:
+        query_sql = text("SELECT * FROM periodo")
+        result_proxy = db.session.execute(query_sql)
+        datos_crudos = []
+        for row in result_proxy.mappings():
+            datos_crudos.append([
+                row["id_periodo"],
+                datetime.strptime(str(row["f_inicio"]), "%a, %d %b %Y %H:%M:%S %Z").strftime("%d/%m/%Y"),
+                datetime.strptime(str(row["f_fin"]), "%a, %d %b %Y %H:%M:%S %Z").strftime("%d/%m/%Y"),
+                datetime.strptime(str(row["f_creacion"]), "%a, %d %b %Y %H:%M:%S %Z").strftime("%d/%m/%Y %H:%M"),
+                datetime.strptime(str(row["f_edicion"]), "%a, %d %b %Y %H:%M:%S %Z").strftime("%d/%m/%Y %H:%M"),
+            ])
+    except Exception as e:
+        print("Error en la consulta:", e)
+        datos_crudos = []
+
+    return render_template("periodos/index.html", data=datos_crudos)
 
 
 @app.route("/salones")
